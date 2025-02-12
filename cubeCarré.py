@@ -23,8 +23,6 @@ class Piece:
         texte = pygame.font.Font(None, int(self.taillePolice)).render(self.texte, 1, (0,0,0))
         screen.blit(texte, (self.position[0] + self.positionTexte[0], self.position[1] + self.positionTexte[1]))
 
-
-
 class Grille:
     def __init__(self):
         self.piece =[
@@ -57,12 +55,21 @@ class Grille:
         for piece in self.piece:
             if piece.position[0] == px:
                 newY = (piece.position[1] + direction) % 3
-                piece.changerPosition(px, newY)   
-     
+                piece.changerPosition(px, newY)
+
+
+def MouvementSouris(positionAncienne: tuple, positionNouvelle: tuple) -> tuple:
+    dx = positionNouvelle[0] - positionAncienne[0]
+    dy = positionNouvelle[1] - positionAncienne[1]
+
+    if abs(dx) > abs(dy):
+        return (dx, 0)
+    else:
+        return (0, dy)
 pygame.init()
 screen = pygame.display.set_mode([700, 500]) # taille fenêtre  
 pygame.display.set_caption("Rubik's carré")
-grille =Grille()
+grille = Grille()
 fenetreOuverte = True
 
 while fenetreOuverte:
@@ -75,11 +82,11 @@ while fenetreOuverte:
               
         if event.type == pygame.MOUSEBUTTONDOWN:
             positionSourisAncienne = pygame.mouse.get_pos()  #renvoie tupple (x,y)
-            pieceAncienne=grille.trouverPiece(positionSourisAncienne)
+            pieceActuelle=grille.trouverPiece(positionSourisAncienne)
             
         if event.type == pygame.MOUSEBUTTONUP :
             positionSourisActuelle=pygame.mouse.get_pos()
-            pieceActuelle=grille.trouverPiece(positionSourisActuelle)
+            
 
             if pieceActuelle[1] == pieceAncienne[1]:  
                 direction = 1 if pieceActuelle[0] > pieceAncienne[0] else -1
