@@ -86,15 +86,14 @@ while fenetreOuverte:
             
         if event.type == pygame.MOUSEBUTTONUP :
             positionSourisActuelle=pygame.mouse.get_pos()
-            
+            mvt = MouvementSouris(positionSourisAncienne, positionSourisActuelle)
 
-            if pieceActuelle[1] == pieceAncienne[1]:  
-                direction = 1 if pieceActuelle[0] > pieceAncienne[0] else -1
-                grille.deplacerLigne(pieceAncienne[1], direction)                                     
-                
-            if pieceActuelle[0] == pieceAncienne[0]:  
-                direction = 1 if pieceActuelle[1] > pieceAncienne[1] else -1
-                grille.deplacerColonne(pieceAncienne[0], direction)     
+            if mvt[1] == 0:  
+                direction = 1 if mvt[0] > 0 else -1
+                grille.deplacerLigne(pieceActuelle[1], direction)
+            elif mvt[0] == 0:  
+                direction = 1 if mvt[1] > 0 else -1
+                grille.deplacerColonne(pieceActuelle[0], direction)     
     
     grille.affichergrille(screen)
     pygame.display.update()
