@@ -5,7 +5,7 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from Constantes import *
+from Enum import *
 import RubiksCubeTailleN
 
 
@@ -34,22 +34,22 @@ def dessinerRubiksCube(rubiksCube):
                 dessinerCarre((origine[0]+x, origine[1]+y, origine[2]+z), (origine[0]+x+1, origine[1]+y, origine[2]+z), (origine[0]+x+1, origine[1]+y, origine[2]+z+1), (origine[0]+x, origine[1]+y, origine[2]+z+1), couleur) # Face inférieure
 
                 if rubiksCube.configuration[x+1][y][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configuration[x+1][y][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configuration[x+1][y][z]]
                     dessinerCarre((origine[0]+x+1.001, origine[1]+y+0.05, origine[2]+z+0.05), (origine[0]+x+1.001, origine[1]+y+0.95, origine[2]+z+0.05), (origine[0]+x+1.001, origine[1]+y+0.95, origine[2]+z+0.95), (origine[0]+x+1.001, origine[1]+y+0.05, origine[2]+z+0.95), couleur)
                 elif rubiksCube.configuration[x-1][y][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configuration[x-1][y][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configuration[x-1][y][z]]
                     dessinerCarre((origine[0]+x-0.001, origine[1]+y+0.05, origine[2]+z+0.05), (origine[0]+x-0.001, origine[1]+y+0.95, origine[2]+z+0.05), (origine[0]+x-0.001, origine[1]+y+0.95, origine[2]+z+0.95), (origine[0]+x-0.001, origine[1]+y+0.05, origine[2]+z+0.95), couleur)
                 if rubiksCube.configuration[x][y+1][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configuration[x][y+1][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configuration[x][y+1][z]]
                     dessinerCarre((origine[0]+x+0.05, origine[1]+y+1.001, origine[2]+z+0.05), (origine[0]+x+0.95, origine[1]+y+1.001, origine[2]+z+0.05), (origine[0]+x+0.95, origine[1]+y+1.001, origine[2]+z+0.95), (origine[0]+x+0.05, origine[1]+y+1.001, origine[2]+z+0.95), couleur)
                 elif rubiksCube.configuration[x][y-1][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configuration[x][y-1][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configuration[x][y-1][z]]
                     dessinerCarre((origine[0]+x+0.05, origine[1]+y-0.001, origine[2]+z+0.05), (origine[0]+x+0.95, origine[1]+y-0.001, origine[2]+z+0.05), (origine[0]+x+0.95, origine[1]+y-0.001, origine[2]+z+0.95), (origine[0]+x+0.05, origine[1]+y-0.001, origine[2]+z+0.95), couleur)
                 if rubiksCube.configuration[x][y][z+1] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configuration[x][y][z+1]]
+                    couleur = Couleur.LIST.value[rubiksCube.configuration[x][y][z+1]]
                     dessinerCarre((origine[0]+x+0.05, origine[1]+y+0.05, origine[2]+z+1.001), (origine[0]+x+0.95, origine[1]+y+0.05, origine[2]+z+1.001), (origine[0]+x+0.95, origine[1]+y+0.95, origine[2]+z+1.001), (origine[0]+x+0.05, origine[1]+y+0.95, origine[2]+z+1.001), couleur)
                 elif rubiksCube.configuration[x][y][z-1] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configuration[x][y][z-1]]
+                    couleur = Couleur.LIST.value[rubiksCube.configuration[x][y][z-1]]
                     dessinerCarre((origine[0]+x+0.05, origine[1]+y+0.05, origine[2]+z-0.001), (origine[0]+x+0.95, origine[1]+y+0.05, origine[2]+z-0.001), (origine[0]+x+0.95, origine[1]+y+0.95, origine[2]+z-0.001), (origine[0]+x+0.05, origine[1]+y+0.95, origine[2]+z-0.001), couleur)
 
     glEnd()
@@ -104,22 +104,22 @@ def afficherRubiksCube(rubiksCube):
         if True in keys:
             if not mouvementEnCours:
                 if keys[pygame.K_u]:
-                    rubiksCube.pivoterFace(UP)
+                    rubiksCube.pivoterFace(Faces.UP)
                     mouvementEnCours = True
                 elif keys[pygame.K_d]:
-                    rubiksCube.pivoterFace(DOWN)
+                    rubiksCube.pivoterFace(Faces.DOWN)
                     mouvementEnCours = True
                 elif keys[pygame.K_l]:
-                    rubiksCube.pivoterFace(LEFT)
+                    rubiksCube.pivoterFace(Faces.LEFT)
                     mouvementEnCours = True
                 elif keys[pygame.K_r]:
-                    rubiksCube.pivoterFace(RIGHT)
+                    rubiksCube.pivoterFace(Faces.RIGHT)
                     mouvementEnCours = True
                 elif keys[pygame.K_f]:
-                    rubiksCube.pivoterFace(FRONT)
+                    rubiksCube.pivoterFace(Faces.FRONT)
                     mouvementEnCours = True
                 elif keys[pygame.K_b]:
-                    rubiksCube.pivoterFace(BACK)
+                    rubiksCube.pivoterFace(Faces.BACK)
                     mouvementEnCours = True
 
             if keys[pygame.K_UP]:
