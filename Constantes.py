@@ -11,8 +11,10 @@ LEFT = 3
 UP = 4
 DOWN = 5
 
-SENS_HORAIRE = -1
+SENS_HORAIRE = -1 # par rapport aux faces
 SENS_ANTIHORAIRE = 1
+SENS_DIRECT = 1 # par rapport aux axes
+SENS_INDIRECT = -1
 
 VERT = (0.1, 0.8, 0.2)
 BLEU = (0, 0, 0.9)
@@ -21,3 +23,5 @@ ORANGE = (1, 0.5, 0)
 JAUNE = (1, 1, 0)
 BLANC = (1, 1, 1)
 COULEURS = [VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC]
+
+SENSIBILITE_SOURIS = 0.3
