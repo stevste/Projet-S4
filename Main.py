@@ -1,4 +1,4 @@
-from Constantes import *
+from Enum import *
 import RubiksCubeTailleN
 import InterfaceEtAffichage
 
