@@ -1,9 +1,10 @@
 from Constantes import *
+import copy
 
 
 class RubiksCube:
     def __init__(self, taille:int=3):
-        self.taille = taille
+        self.taille = taille # nombre de petits cubes sur une arête du Rubik's
         
         self.configuration = []
         for x in range(self.taille +2):
@@ -27,6 +28,13 @@ class RubiksCube:
                         self.configuration[x][y].append(5)
                     else:
                         self.configuration[x][y].append(STRUCTURE)
+        
+        # Pour l'affichage des rotations :
+        self.mouvementEnCours = False
+        self.axeRotationEnCours = None # AXE_X, AXE_Y ou AXE_Z
+        self.abscisseFaceEnRotation:int = 0 # abscisse selon l'axe de rotation (peut être X, Y ou Z)
+        self.angleRotationEnCours = 0 # en degrés
+        self.configurationAnterieure = self.configuration
     
     def __repr__(self):
         texte = ''
@@ -44,17 +52,21 @@ class RubiksCube:
         return texte + '----------'
     
     def pivoterPlan(self, axe:int=AXE_X, abscisseFace:int=0, sens=SENS_HORAIRE) -> None:
+        self.abscisseFaceEnRotation = abscisseFace
         xAParcourir = range(self.taille +2)
         yAParcourir = range(self.taille +2)
         zAParcourir = range(self.taille +2)
         
         if axe == AXE_X:
             xAParcourir = [abscisseFace]
+            self.axeRotationEnCours = AXE_X
         elif axe == AXE_Y:
             yAParcourir = [abscisseFace]
             sens *= -1 # car la base (y, x, z) est indirecte alors que (x, y, z) et (z, x, y) sont directes
+            self.axeRotationEnCours = AXE_Y
         else: # axe == AXE_Z:
             zAParcourir = [abscisseFace]
+            self.axeRotationEnCours = AXE_Z
         
         listeDesCouleurs = []
         for x in xAParcourir:
@@ -74,11 +86,14 @@ class RubiksCube:
                     n += 1
     
     def pivoterFace(self, nomFace:int=FRONT, sens=SENS_HORAIRE, distanceAuBord:int=1) -> None:
+        self.mouvementEnCours = True
+        self.configurationAnterieure = copy.deepcopy(self.configuration)
         if distanceAuBord == 1:
-            couronnesATourner = [0, 1]
+            couronnesATourner = [0, 1] # on doit touner les "gomettes" sur la face et celles sur la tranche de la face
         elif distanceAuBord <= self.taille//2:
-            couronnesATourner = [distanceAuBord]
+            couronnesATourner = [distanceAuBord] # on ne tourne que les "gomettes" sur la tranche
         else:
+            self.mouvementEnCours = False
             print('Attention à bien respecter la notation : la distance au bord doit être comprise entre 1 et taille//2 inclus.')
         
         for couronne in couronnesATourner:
