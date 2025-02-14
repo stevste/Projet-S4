@@ -6,7 +6,7 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from Constantes import *
+from Enum import *
 import RubiksCubeTailleN
 
 
@@ -32,11 +32,11 @@ def dessinerRubiksCube(rubiksCube):
     glBegin(GL_QUADS)
     origine = (-(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2)
     
-    if rubiksCube.axeRotationEnCours == AXE_X:
+    if rubiksCube.axeRotationEnCours == Axes.X:
         xLocal = (1, 0, 0)
         yLocal = (0, math.cos(rubiksCube.angleRotationEnCours*math.pi/180), math.sin(rubiksCube.angleRotationEnCours*math.pi/180))
         zLocal = (0, math.cos(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), math.sin(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180))
-    elif rubiksCube.axeRotationEnCours == AXE_Y:
+    elif rubiksCube.axeRotationEnCours == Axes.Y:
         xLocal = (math.cos(rubiksCube.angleRotationEnCours*math.pi/180), 0, math.sin(rubiksCube.angleRotationEnCours*math.pi/180))
         yLocal = (0, 1, 0)
         zLocal = (math.cos(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), 0, math.sin(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180))
@@ -48,7 +48,7 @@ def dessinerRubiksCube(rubiksCube):
     for x in range(1, rubiksCube.taille +1):
         for y in range(1, rubiksCube.taille +1):
             for z in range(1, rubiksCube.taille +1):
-                if rubiksCube.mouvementEnCours and (x, y, z)[rubiksCube.axeRotationEnCours] == rubiksCube.abscisseFaceEnRotation:
+                if rubiksCube.mouvementEnCours and (x, y, z)[rubiksCube.axeRotationEnCours.value] == rubiksCube.abscisseFaceEnRotation:
                     uX = xLocal
                     uY = yLocal
                     uZ = zLocal
@@ -65,22 +65,22 @@ def dessinerRubiksCube(rubiksCube):
         
                 # On colle les "gomettes" sur les faces des petits cubes :
                 if rubiksCube.configurationAnterieure[x+1][y][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configurationAnterieure[x+1][y][z]]
-                    dessinerCarre((origineCube[0]+1.001*uX[0]+0.05*uY[0]+0.05*uZ[0], origineCube[1]+1.001*uX[1]+0.05*uY[1]+0.05*uZ[1], origineCube[2]+1.001*uX[2]+0.05*uY[2]+0.05*uZ[2]), (origineCube[0]+1.001*uX[0]+0.95*uY[0]+0.05*uZ[0], origineCube[1]+1.001*uX[1]+0.95*uY[1]+0.05*uZ[1], origineCube[2]+1.001*uX[2]+0.95*uY[2]+0.05*uZ[2]), (origineCube[0]+1.001*uX[0]+0.95*uY[0]+0.95*uZ[0], origineCube[1]+1.001*uX[1]+0.95*uY[1]+0.95*uZ[1], origineCube[2]+1.001*uX[2]+0.95*uY[2]+0.95*uZ[2]), (origineCube[0]+1.001*uX[0]+0.05*uY[0]+0.95*uZ[0], origineCube[1]+1.001*uX[1]+0.05*uY[1]+0.95*uZ[1], origineCube[2]+1.001*uX[2]+0.05*uY[2]+0.95*uZ[2]), couleur)
+                    couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x+1][y][z]]
+                    dessinerCarre((origineCube[0]+1.001*uX[0]+0.05*uY[0]+0.05*uZ[0], origineCube[1]+1.001*uX[1]+0.05*uY[1]+0.05*uZ[1], origineCube[2]+1.001*uX[2]+0.05*uY[2]+0.05*uZ[2]), (origineCube[0]+1.001*uX[0]+0.95*uY[0]+0.05*uZ[0], origineCube[1]+1.001*uX[1]+0.95*uY[1]+0.05*uZ[1], origineCube[2]+1.001*uX[2]+0.95*uY[2]+0.05*uZ[2]), (origineCube[0]+1.001*uX[0]+0.95*uY[0]+0.95*uZ[0], origineCube[1]+1.001*uX[1]+0.95*uY[1]+0.95*uZ[1], origineCube[2]+1.001*uX[2]+0.95*uY[2]+0.95*uZ[2]), (origineCube[0]+1.001*uX[0]+0.05*uY[0]+0.95*uZ[0], origineCube[1]+1.001*uX[1]+0.05*uY[1]+0.95*uZ[1], origineCube[2]+1.001*uX[2]+0.05*uY[2]+0.95*uZ[2]), couleur)                
                 elif rubiksCube.configurationAnterieure[x-1][y][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configurationAnterieure[x-1][y][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x-1][y][z]]
                     dessinerCarre((origineCube[0]-0.001*uX[0]+0.05*uY[0]+0.05*uZ[0], origineCube[1]-0.001*uX[1]+0.05*uY[1]+0.05*uZ[1], origineCube[2]-0.001*uX[2]+0.05*uY[2]+0.05*uZ[2]), (origineCube[0]-0.001*uX[0]+0.95*uY[0]+0.05*uZ[0], origineCube[1]-0.001*uX[1]+0.95*uY[1]+0.05*uZ[1], origineCube[2]-0.001*uX[2]+0.95*uY[2]+0.05*uZ[2]), (origineCube[0]-0.001*uX[0]+0.95*uY[0]+0.95*uZ[0], origineCube[1]-0.001*uX[1]+0.95*uY[1]+0.95*uZ[1], origineCube[2]-0.001*uX[2]+0.95*uY[2]+0.95*uZ[2]), (origineCube[0]-0.001*uX[0]+0.05*uY[0]+0.95*uZ[0], origineCube[1]-0.001*uX[1]+0.05*uY[1]+0.95*uZ[1], origineCube[2]-0.001*uX[2]+0.05*uY[2]+0.95*uZ[2]), couleur)
                 if rubiksCube.configurationAnterieure[x][y+1][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configurationAnterieure[x][y+1][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y+1][z]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+1.001*uY[0]+0.05*uZ[0], origineCube[1]+0.05*uX[1]+1.001*uY[1]+0.05*uZ[1], origineCube[2]+0.05*uX[2]+1.001*uY[2]+0.05*uZ[2]), (origineCube[0]+0.95*uX[0]+1.001*uY[0]+0.05*uZ[0], origineCube[1]+0.95*uX[1]+1.001*uY[1]+0.05*uZ[1], origineCube[2]+0.95*uX[2]+1.001*uY[2]+0.05*uZ[2]), (origineCube[0]+0.95*uX[0]+1.001*uY[0]+0.95*uZ[0], origineCube[1]+0.95*uX[1]+1.001*uY[1]+0.95*uZ[1], origineCube[2]+0.95*uX[2]+1.001*uY[2]+0.95*uZ[2]), (origineCube[0]+0.05*uX[0]+1.001*uY[0]+0.95*uZ[0], origineCube[1]+0.05*uX[1]+1.001*uY[1]+0.95*uZ[1], origineCube[2]+0.05*uX[2]+1.001*uY[2]+0.95*uZ[2]), couleur)
                 elif rubiksCube.configurationAnterieure[x][y-1][z] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configurationAnterieure[x][y-1][z]]
+                    couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y-1][z]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]-0.001*uY[0]+0.05*uZ[0], origineCube[1]+0.05*uX[1]-0.001*uY[1]+0.05*uZ[1], origineCube[2]+0.05*uX[2]-0.001*uY[2]+0.05*uZ[2]), (origineCube[0]+0.95*uX[0]-0.001*uY[0]+0.05*uZ[0], origineCube[1]+0.95*uX[1]-0.001*uY[1]+0.05*uZ[1], origineCube[2]+0.95*uX[2]-0.001*uY[2]+0.05*uZ[2]), (origineCube[0]+0.95*uX[0]-0.001*uY[0]+0.95*uZ[0], origineCube[1]+0.95*uX[1]-0.001*uY[1]+0.95*uZ[1], origineCube[2]+0.95*uX[2]-0.001*uY[2]+0.95*uZ[2]), (origineCube[0]+0.05*uX[0]-0.001*uY[0]+0.95*uZ[0], origineCube[1]+0.05*uX[1]-0.001*uY[1]+0.95*uZ[1], origineCube[2]+0.05*uX[2]-0.001*uY[2]+0.95*uZ[2]), couleur)
                 if rubiksCube.configurationAnterieure[x][y][z+1] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configurationAnterieure[x][y][z+1]]
+                    couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y][z+1]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]+1.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]+1.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]+1.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]+1.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]+1.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]+1.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]+1.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]+1.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]+1.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]+1.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]+1.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]+1.001*uZ[2]), couleur)
                 elif rubiksCube.configurationAnterieure[x][y][z-1] != STRUCTURE:
-                    couleur = COULEURS[rubiksCube.configurationAnterieure[x][y][z-1]]
+                    couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y][z-1]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]-0.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]-0.001*uZ[2]), couleur)
     glEnd()
     
@@ -132,23 +132,23 @@ def afficherRubiksCube(rubiksCube):
         if True in keys:
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
-                    rubiksCube.pivoterFace(UP)
-                    sens = SENS_INDIRECT
+                    rubiksCube.pivoterFace(Faces.UP)
+                    sens = Sens.ANTIHORAIRE.value
                 elif keys[pygame.K_d]:
-                    rubiksCube.pivoterFace(DOWN)
-                    sens = SENS_DIRECT
+                    rubiksCube.pivoterFace(Faces.DOWN)
+                    sens = Sens.HORAIRE.value
                 elif keys[pygame.K_l]:
-                    rubiksCube.pivoterFace(LEFT)
-                    sens = SENS_DIRECT
+                    rubiksCube.pivoterFace(Faces.LEFT)
+                    sens = Sens.HORAIRE.value
                 elif keys[pygame.K_r]:
-                    rubiksCube.pivoterFace(RIGHT)
-                    sens = SENS_INDIRECT
+                    rubiksCube.pivoterFace(Faces.RIGHT)
+                    sens = Sens.ANTIHORAIRE.value
                 elif keys[pygame.K_f]:
-                    rubiksCube.pivoterFace(FRONT)
-                    sens = SENS_INDIRECT
+                    rubiksCube.pivoterFace(Faces.FRONT)
+                    sens = Sens.ANTIHORAIRE.value
                 elif keys[pygame.K_b]:
-                    rubiksCube.pivoterFace(BACK)
-                    sens = SENS_DIRECT
+                    rubiksCube.pivoterFace(Faces.BACK)
+                    sens = Sens.HORAIRE.value
 
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)

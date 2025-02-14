@@ -1,4 +1,3 @@
-from Constantes import *
 import RubiksCubeTailleN
 import InterfaceEtAffichage
 

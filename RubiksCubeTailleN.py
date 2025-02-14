@@ -1,4 +1,4 @@
-from Constantes import *
+from Enum import *
 import copy
 
 
@@ -51,22 +51,22 @@ class RubiksCube:
             texte += '\n'
         return texte + '----------'
     
-    def pivoterPlan(self, axe:int=AXE_X, abscisseFace:int=0, sens=SENS_HORAIRE) -> None:
+    def pivoterPlan(self, axe:int=Axes.X, abscisseFace:int=0, sens=Sens.HORAIRE) -> None:
         self.abscisseFaceEnRotation = abscisseFace
         xAParcourir = range(self.taille +2)
         yAParcourir = range(self.taille +2)
         zAParcourir = range(self.taille +2)
         
-        if axe == AXE_X:
+        if axe == Axes.X:
             xAParcourir = [abscisseFace]
-            self.axeRotationEnCours = AXE_X
-        elif axe == AXE_Y:
+            self.axeRotationEnCours = Axes.X
+        elif axe == Axes.Y:
             yAParcourir = [abscisseFace]
             sens *= -1 # car la base (y, x, z) est indirecte alors que (x, y, z) et (z, x, y) sont directes
-            self.axeRotationEnCours = AXE_Y
+            self.axeRotationEnCours = Axes.Y
         else: # axe == AXE_Z:
             zAParcourir = [abscisseFace]
-            self.axeRotationEnCours = AXE_Z
+            self.axeRotationEnCours = Axes.Z
         
         listeDesCouleurs = []
         for x in xAParcourir:
@@ -78,14 +78,14 @@ class RubiksCube:
         for x in xAParcourir:
             for y in yAParcourir:
                 for z in zAParcourir:
-                    if sens == SENS_ANTIHORAIRE:
+                    if sens == Sens.ANTIHORAIRE:
                         indiceAInserer = (n%(self.taille+2))*(self.taille+2) + self.taille+1 - n//(self.taille+2)
                     else: # sens == SENS_HORAIRE:
                         indiceAInserer = (self.taille+1-n%(self.taille+2))*(self.taille+2) + n//(self.taille+2)
                     self.configuration[x][y][z] = listeDesCouleurs[indiceAInserer]
                     n += 1
     
-    def pivoterFace(self, nomFace:int=FRONT, sens=SENS_HORAIRE, distanceAuBord:int=1) -> None:
+    def pivoterFace(self, nomFace:int=Faces.FRONT, sens=Sens.HORAIRE.value, distanceAuBord:int=1) -> None:
         self.mouvementEnCours = True
         self.configurationAnterieure = copy.deepcopy(self.configuration)
         if distanceAuBord == 1:
@@ -97,18 +97,18 @@ class RubiksCube:
             print('Attention à bien respecter la notation : la distance au bord doit être comprise entre 1 et taille//2 inclus.')
         
         for couronne in couronnesATourner:
-            if nomFace == FRONT:
-                self.pivoterPlan(AXE_Y, couronne, -sens)
-            elif nomFace == BACK:
-                self.pivoterPlan(AXE_Y, self.taille+1 - couronne, sens)
-            elif nomFace == LEFT:
-                self.pivoterPlan(AXE_X, couronne, -sens)
-            elif nomFace == RIGHT:
-                self.pivoterPlan(AXE_X, self.taille+1 - couronne, sens)
-            elif nomFace == DOWN:
-                self.pivoterPlan(AXE_Z, couronne, -sens)
+            if nomFace == Faces.FRONT:
+                self.pivoterPlan(Axes.Y, couronne, -sens)
+            elif nomFace == Faces.BACK:
+                self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens)
+            elif nomFace == Faces.LEFT:
+                self.pivoterPlan(Axes.X, couronne, -sens)
+            elif nomFace == Faces.RIGHT:
+                self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens)
+            elif nomFace == Faces.DOWN:
+                self.pivoterPlan(Axes.Z, couronne, -sens)
             else: # nomFace == UP:
-                self.pivoterPlan(AXE_Z, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens)
 
             
 '''
