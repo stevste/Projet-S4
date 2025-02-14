@@ -88,7 +88,7 @@ def dessinerRubiksCube(rubiksCube):
 def afficherRubiksCube(rubiksCube):
     pygame.init()
     display = (800,600)
-    screen = pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
+    pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
     pygame.display.set_caption("Rubik's Cube")
     
     gluPerspective(40, display[0]/display[1], 1, 50)
@@ -133,23 +133,16 @@ def afficherRubiksCube(rubiksCube):
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.pivoterFace(Faces.UP)
-                    sens = Sens.ANTIHORAIRE.value
                 elif keys[pygame.K_d]:
                     rubiksCube.pivoterFace(Faces.DOWN)
-                    sens = Sens.HORAIRE.value
                 elif keys[pygame.K_l]:
                     rubiksCube.pivoterFace(Faces.LEFT)
-                    sens = Sens.HORAIRE.value
                 elif keys[pygame.K_r]:
                     rubiksCube.pivoterFace(Faces.RIGHT)
-                    sens = Sens.ANTIHORAIRE.value
                 elif keys[pygame.K_f]:
                     rubiksCube.pivoterFace(Faces.FRONT)
-                    sens = Sens.ANTIHORAIRE.value
                 elif keys[pygame.K_b]:
                     rubiksCube.pivoterFace(Faces.BACK)
-                    sens = Sens.HORAIRE.value
-
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
             elif keys[pygame.K_DOWN]:
@@ -167,7 +160,7 @@ def afficherRubiksCube(rubiksCube):
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour
-                rubiksCube.angleRotationEnCours += sens*10
+                rubiksCube.angleRotationEnCours -= 10
             else: # la rotation est terminée
                 rubiksCube.angleRotationEnCours = 0
                 rubiksCube.axeRotationEnCours = None
