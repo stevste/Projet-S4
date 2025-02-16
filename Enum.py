@@ -16,8 +16,8 @@ class Faces(Enum):
     DOWN = 5
 
 class Sens(Enum):
-    HORAIRE = -1
-    ANTIHORAIRE = 1
+    HORAIRE = 1
+    ANTIHORAIRE = -1
 
 class Couleur(Enum):
     VERT = (0.1, 0.8, 0.2)
@@ -26,4 +26,7 @@ class Couleur(Enum):
     ORANGE = (1, 0.5, 0)
     JAUNE = (1, 1, 0)
     BLANC = (1, 1, 1)
+    
     LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
+
+SENSIBILITE_SOURIS = 0.3
