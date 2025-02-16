@@ -1,7 +1,5 @@
 from Enum import *
 import copy
-
-
 class RubiksCube:
     def __init__(self, taille:int=3):
         self.taille = taille # nombre de petits cubes sur une arête du Rubik's
@@ -52,6 +50,7 @@ class RubiksCube:
         return texte + '----------'
     
     def pivoterPlan(self, axe:int=Axes.X, abscisseFace:int=0, sens=Sens.HORAIRE) -> None:
+
         self.abscisseFaceEnRotation = abscisseFace
         xAParcourir = range(self.taille +2)
         yAParcourir = range(self.taille +2)
@@ -59,7 +58,9 @@ class RubiksCube:
         
         if axe == Axes.X:
             xAParcourir = [abscisseFace]
+
             self.axeRotationEnCours = Axes.X
+
         elif axe == Axes.Y:
             yAParcourir = [abscisseFace]
             sens *= -1 # car la base (y, x, z) est indirecte alors que (x, y, z) et (z, x, y) sont directes
@@ -84,10 +85,11 @@ class RubiksCube:
                         indiceAInserer = (self.taille+1-n%(self.taille+2))*(self.taille+2) + n//(self.taille+2)
                     self.configuration[x][y][z] = listeDesCouleurs[indiceAInserer]
                     n += 1
-    
+
     def pivoterFace(self, nomFace:int=Faces.FRONT, sens=Sens.HORAIRE.value, distanceAuBord:int=1) -> None:
         self.mouvementEnCours = True
         self.configurationAnterieure = copy.deepcopy(self.configuration)
+
         if distanceAuBord == 1:
             couronnesATourner = [0, 1] # on doit touner les "gomettes" sur la face et celles sur la tranche de la face
         elif distanceAuBord <= self.taille//2:

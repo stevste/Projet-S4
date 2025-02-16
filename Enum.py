@@ -26,6 +26,7 @@ class Couleur(Enum):
     ORANGE = (1, 0.5, 0)
     JAUNE = (1, 1, 0)
     BLANC = (1, 1, 1)
+    
     LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
 
 SENSIBILITE_SOURIS = 0.3

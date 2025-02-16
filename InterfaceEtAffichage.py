@@ -82,6 +82,7 @@ def dessinerRubiksCube(rubiksCube):
                 elif rubiksCube.configurationAnterieure[x][y][z-1] != STRUCTURE:
                     couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y][z-1]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]-0.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]-0.001*uZ[2]), couleur)
+
     glEnd()
     
 
@@ -133,6 +134,7 @@ def afficherRubiksCube(rubiksCube):
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.pivoterFace(Faces.UP)
+
                 elif keys[pygame.K_d]:
                     rubiksCube.pivoterFace(Faces.DOWN)
                 elif keys[pygame.K_l]:
@@ -143,6 +145,7 @@ def afficherRubiksCube(rubiksCube):
                     rubiksCube.pivoterFace(Faces.FRONT)
                 elif keys[pygame.K_b]:
                     rubiksCube.pivoterFace(Faces.BACK)
+
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
             elif keys[pygame.K_DOWN]:
