@@ -7,7 +7,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from Enum import *
-import RubiksCubeTailleN
 
 
 
@@ -19,7 +18,7 @@ def dessinerCarre(point1:tuple, point2:tuple, point3:tuple, point4:tuple, couleu
     glVertex3f(point4[0], point4[1], point4[2])
 
 
-def dessinerCube(origine:tuple, baseLocale:tuple, couleur) -> None:
+def dessinerCube(origine:tuple, baseLocale:tuple, couleur:tuple) -> None:
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[0][0], origine[1]+baseLocale[0][1], origine[2]+baseLocale[0][2]), (origine[0]+baseLocale[0][0]+baseLocale[1][0], origine[1]+baseLocale[0][1]+baseLocale[1][1], origine[2]+baseLocale[0][2]+baseLocale[1][2]), (origine[0]+baseLocale[1][0], origine[1]+baseLocale[1][1], origine[2]+baseLocale[1][2]), couleur) # Face avant
     dessinerCarre((origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), (origine[0]+baseLocale[0][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[2][2]), (origine[0]+baseLocale[0][0]+baseLocale[1][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[1][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[1][2]+baseLocale[2][2]), (origine[0]+baseLocale[1][0]+baseLocale[2][0], origine[1]+baseLocale[1][1]+baseLocale[2][1], origine[2]+baseLocale[1][2]+baseLocale[2][2]), couleur) # Face arrière
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[1][0], origine[1]+baseLocale[1][1], origine[2]+baseLocale[1][2]), (origine[0]+baseLocale[1][0]+baseLocale[2][0], origine[1]+baseLocale[1][1]+baseLocale[2][1], origine[2]+baseLocale[1][2]+baseLocale[2][2]), (origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), couleur) # Face gauche
@@ -28,7 +27,7 @@ def dessinerCube(origine:tuple, baseLocale:tuple, couleur) -> None:
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[0][0], origine[1]+baseLocale[0][1], origine[2]+baseLocale[0][2]), (origine[0]+baseLocale[0][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[2][2]), (origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), couleur) # Face inférieure
 
 
-def dessinerRubiksCube(rubiksCube):
+def dessinerRubiksCube(rubiksCube) -> None:
     glBegin(GL_QUADS)
     origine = (-(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2)
     
@@ -40,7 +39,7 @@ def dessinerRubiksCube(rubiksCube):
         xLocal = (math.cos(rubiksCube.angleRotationEnCours*math.pi/180), 0, math.sin(rubiksCube.angleRotationEnCours*math.pi/180))
         yLocal = (0, 1, 0)
         zLocal = (math.cos(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), 0, math.sin(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180))
-    else: # rubiksCube.axeRotationEnCours == AXE_Z:
+    else: # rubiksCube.axeRotationEnCours == Axes.Z:
         xLocal = (math.cos(rubiksCube.angleRotationEnCours*math.pi/180), math.sin(rubiksCube.angleRotationEnCours*math.pi/180), 0)
         yLocal = (math.cos(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), math.sin(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), 0)
         zLocal = (0, 0, 1)
@@ -82,17 +81,16 @@ def dessinerRubiksCube(rubiksCube):
                 elif rubiksCube.configurationAnterieure[x][y][z-1] != STRUCTURE:
                     couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y][z-1]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]-0.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]-0.001*uZ[2]), couleur)
-
     glEnd()
     
 
-def afficherRubiksCube(rubiksCube):
+def afficherRubiksCube(rubiksCube) -> None:
     pygame.init()
-    display = (800,600)
-    pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
+    dimensions = (800,600)
+    pygame.display.set_mode(dimensions, DOUBLEBUF|OPENGL)
     pygame.display.set_caption("Rubik's Cube")
     
-    gluPerspective(40, display[0]/display[1], 1, 50)
+    gluPerspective(40, dimensions[0]/dimensions[1], 1, 50)
     glTranslatef(0,0,-10)
     glRotatef(-30, 0,0,1)
     angleRadiansZ = 30*math.pi/180
@@ -134,17 +132,22 @@ def afficherRubiksCube(rubiksCube):
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.pivoterFace(Faces.UP)
-
+                    sens = Sens.HORAIRE # sens indirect selon l'axe z
                 elif keys[pygame.K_d]:
                     rubiksCube.pivoterFace(Faces.DOWN)
+                    sens = Sens.ANTIHORAIRE # sens direct selon l'axe z
                 elif keys[pygame.K_l]:
                     rubiksCube.pivoterFace(Faces.LEFT)
+                    sens = Sens.ANTIHORAIRE # sens direct selon l'axe x
                 elif keys[pygame.K_r]:
                     rubiksCube.pivoterFace(Faces.RIGHT)
+                    sens = Sens.HORAIRE # sens indirect selon l'axe x
                 elif keys[pygame.K_f]:
                     rubiksCube.pivoterFace(Faces.FRONT)
+                    sens = Sens.HORAIRE # sens indirect selon l'axe y
                 elif keys[pygame.K_b]:
                     rubiksCube.pivoterFace(Faces.BACK)
+                    sens = Sens.ANTIHORAIRE # sens direct selon l'axe y
 
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
@@ -163,7 +166,7 @@ def afficherRubiksCube(rubiksCube):
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour
-                rubiksCube.angleRotationEnCours -= 10
+                rubiksCube.angleRotationEnCours -= sens.value*10
             else: # la rotation est terminée
                 rubiksCube.angleRotationEnCours = 0
                 rubiksCube.axeRotationEnCours = None
