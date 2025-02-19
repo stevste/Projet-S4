@@ -98,6 +98,8 @@ def afficherRubiksCube(rubiksCube) -> None:
     rotationY = math.sin(angleRadiansZ)
     glRotatef(-60, rotationX, rotationY, 0)
     
+    historiqueRotations = [(-30,0,0,1), (-60, rotationX, rotationY, 0)] # Pour pouvoir réinitialiser la vue
+        
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
     
@@ -118,9 +120,14 @@ def afficherRubiksCube(rubiksCube) -> None:
             if positionClicSouris is None:
                 positionClicSouris = positionActuelle
             else:
-                glRotatef(int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS), 0,0,1)
-                angleRadiansZ -= int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS)*math.pi/180
-                glRotatef(int((positionActuelle[1] - positionClicSouris[1])*SENSIBILITE_SOURIS), rotationX, rotationY, 0)
+                deplacementHorizontal = int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS)
+                glRotatef(deplacementHorizontal, 0,0,1)
+                historiqueRotations.append((deplacementHorizontal, 0,0,1))
+                angleRadiansZ -= deplacementHorizontal*math.pi/180
+                
+                deplacementVertical = int((positionActuelle[1] - positionClicSouris[1])*SENSIBILITE_SOURIS)
+                glRotatef(deplacementVertical, rotationX, rotationY, 0)
+                historiqueRotations.append((deplacementVertical, rotationX, rotationY, 0))
                 rotationX = math.cos(angleRadiansZ)
                 rotationY = math.sin(angleRadiansZ)
                 positionClicSouris = positionActuelle
@@ -129,6 +136,17 @@ def afficherRubiksCube(rubiksCube) -> None:
         
         keys = pygame.key.get_pressed()
         if True in keys:
+            if keys[pygame.K_SPACE]: # Réinitialisation de la vue
+                for indice in range(len(historiqueRotations)-1, -1, -1):
+                    rotation = historiqueRotations[indice]
+                    glRotatef(-rotation[0], rotation[1], rotation[2], rotation[3])
+                glRotatef(-30, 0,0,1)
+                angleRadiansZ = 30*math.pi/180
+                rotationX = math.cos(angleRadiansZ)
+                rotationY = math.sin(angleRadiansZ)
+                glRotatef(-60, rotationX, rotationY, 0)
+                historiqueRotations = [(-30,0,0,1), (-60, rotationX, rotationY, 0)]
+                
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.pivoterFace(Faces.UP)
@@ -151,15 +169,19 @@ def afficherRubiksCube(rubiksCube) -> None:
 
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
+                historiqueRotations.append((-10, rotationX, rotationY, 0))
             elif keys[pygame.K_DOWN]:
                 glRotatef(10, rotationX, rotationY, 0)
+                historiqueRotations.append((10, rotationX, rotationY, 0))
             if keys[pygame.K_LEFT]:
                 glRotatef(-10, 0,0,1)
+                historiqueRotations.append((-10, 0,0,1))
                 angleRadiansZ += 10*math.pi/180
                 rotationX = math.cos(angleRadiansZ)
                 rotationY = math.sin(angleRadiansZ)
             elif keys[pygame.K_RIGHT]:
                 glRotatef(10, 0,0,1)
+                historiqueRotations.append((10, 0,0,1))
                 angleRadiansZ -= 10*math.pi/180
                 rotationX = math.cos(angleRadiansZ)
                 rotationY = math.sin(angleRadiansZ)
