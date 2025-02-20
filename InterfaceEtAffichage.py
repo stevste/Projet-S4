@@ -7,6 +7,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from Enum import *
+from Solver3D import *
 import RubiksCubeTailleN
 
 
@@ -132,19 +133,22 @@ def afficherRubiksCube(rubiksCube):
         keys = pygame.key.get_pressed()
         if True in keys:
             if not rubiksCube.mouvementEnCours:
+                if len(rubiksCube.listActions) > 0:
+                    rubiksCube.pivoterFace(rubiksCube.listActions[0][0], rubiksCube.listActions[0][1])
+                    del rubiksCube.listActions[0]
+                
                 if keys[pygame.K_u]:
-                    rubiksCube.pivoterFace(Faces.UP)
-
+                    rubiksCube.ajouterAction((Faces.UP, Sens.HORAIRE))
                 elif keys[pygame.K_d]:
-                    rubiksCube.pivoterFace(Faces.DOWN)
+                    rubiksCube.ajouterAction((Faces.DOWN, Sens.HORAIRE))
                 elif keys[pygame.K_l]:
-                    rubiksCube.pivoterFace(Faces.LEFT)
+                    rubiksCube.ajouterAction((Faces.LEFT, Sens.HORAIRE))
                 elif keys[pygame.K_r]:
-                    rubiksCube.pivoterFace(Faces.RIGHT)
+                    rubiksCube.ajouterAction((Faces.RIGHT, Sens.HORAIRE))
                 elif keys[pygame.K_f]:
-                    rubiksCube.pivoterFace(Faces.FRONT)
+                    rubiksCube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
                 elif keys[pygame.K_b]:
-                    rubiksCube.pivoterFace(Faces.BACK)
+                    rubiksCube.ajouterAction((Faces.BACK, Sens.HORAIRE))
 
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
@@ -160,6 +164,9 @@ def afficherRubiksCube(rubiksCube):
                 angleRadiansZ -= 10*math.pi/180
                 rotationX = math.cos(angleRadiansZ)
                 rotationY = math.sin(angleRadiansZ)
+
+            if keys[pygame.K_j]:
+                jouerFormule([(Faces.RIGHT, Sens.HORAIRE), (Faces.RIGHT, Sens.HORAIRE), (Faces.UP, Sens.HORAIRE)], rubiksCube)
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour

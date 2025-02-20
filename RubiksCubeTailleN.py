@@ -33,6 +33,7 @@ class RubiksCube:
         self.abscisseFaceEnRotation:int = 0 # abscisse selon l'axe de rotation (peut être X, Y ou Z)
         self.angleRotationEnCours = 0 # en degrés
         self.configurationAnterieure = self.configuration
+        self.listActions = [] #Actions sous la forme: (Faces, sens)
     
     def __repr__(self):
         texte = ''
@@ -49,6 +50,9 @@ class RubiksCube:
             texte += '\n'
         return texte + '----------'
     
+    def ajouterAction(self, action: tuple):
+        self.listActions.append(action)
+
     def pivoterPlan(self, axe:int=Axes.X, abscisseFace:int=0, sens=Sens.HORAIRE) -> None:
 
         self.abscisseFaceEnRotation = abscisseFace
@@ -86,7 +90,7 @@ class RubiksCube:
                     self.configuration[x][y][z] = listeDesCouleurs[indiceAInserer]
                     n += 1
 
-    def pivoterFace(self, nomFace:int=Faces.FRONT, sens=Sens.HORAIRE.value, distanceAuBord:int=1) -> None:
+    def pivoterFace(self, nomFace:int=Faces.FRONT, sens=Sens.HORAIRE, distanceAuBord:int=1) -> None:
         self.mouvementEnCours = True
         self.configurationAnterieure = copy.deepcopy(self.configuration)
 
@@ -100,17 +104,17 @@ class RubiksCube:
         
         for couronne in couronnesATourner:
             if nomFace == Faces.FRONT:
-                self.pivoterPlan(Axes.Y, couronne, -sens)
+                self.pivoterPlan(Axes.Y, couronne, -sens.value)
             elif nomFace == Faces.BACK:
-                self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.LEFT:
-                self.pivoterPlan(Axes.X, couronne, -sens)
+                self.pivoterPlan(Axes.X, couronne, -sens.value)
             elif nomFace == Faces.RIGHT:
-                self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.DOWN:
-                self.pivoterPlan(Axes.Z, couronne, -sens)
+                self.pivoterPlan(Axes.Z, couronne, -sens.value)
             else: # nomFace == UP:
-                self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens.value)
 
             
 '''
