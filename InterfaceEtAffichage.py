@@ -114,6 +114,10 @@ def afficherRubiksCube(rubiksCube):
                 running = False
                 pygame.quit()
                 sys.exit()
+
+        if len(rubiksCube.listActions) > 0 and (not rubiksCube.mouvementEnCours):
+            rubiksCube.pivoterFace(rubiksCube.listActions[0][0], rubiksCube.listActions[0][1])
+            del rubiksCube.listActions[0]
                 
         clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
         if clicDroitMaintenu:
@@ -133,10 +137,6 @@ def afficherRubiksCube(rubiksCube):
         keys = pygame.key.get_pressed()
         if True in keys:
             if not rubiksCube.mouvementEnCours:
-                if len(rubiksCube.listActions) > 0:
-                    rubiksCube.pivoterFace(rubiksCube.listActions[0][0], rubiksCube.listActions[0][1])
-                    del rubiksCube.listActions[0]
-                
                 if keys[pygame.K_u]:
                     rubiksCube.ajouterAction((Faces.UP, Sens.HORAIRE))
                 elif keys[pygame.K_d]:
@@ -149,6 +149,8 @@ def afficherRubiksCube(rubiksCube):
                     rubiksCube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
                 elif keys[pygame.K_b]:
                     rubiksCube.ajouterAction((Faces.BACK, Sens.HORAIRE))
+                if keys[pygame.K_j]:
+                    jouerFormule([(Faces.RIGHT, Sens.HORAIRE), (Faces.RIGHT, Sens.HORAIRE), (Faces.UP, Sens.HORAIRE)], rubiksCube)
 
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
@@ -164,9 +166,6 @@ def afficherRubiksCube(rubiksCube):
                 angleRadiansZ -= 10*math.pi/180
                 rotationX = math.cos(angleRadiansZ)
                 rotationY = math.sin(angleRadiansZ)
-
-            if keys[pygame.K_j]:
-                jouerFormule([(Faces.RIGHT, Sens.HORAIRE), (Faces.RIGHT, Sens.HORAIRE), (Faces.UP, Sens.HORAIRE)], rubiksCube)
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour
