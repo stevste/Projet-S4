@@ -14,6 +14,8 @@ class Faces(Enum):
     LEFT = 3
     UP = 4
     DOWN = 5
+    
+    SIGNES_ABSCISSES = (1, -1, 1, -1, 1, -1) # 1 si la face a une abscisse positive par rapport à son axe de rotation, -1 sinon
 
 class Sens(Enum):
     HORAIRE = 1
@@ -25,7 +27,7 @@ class Couleur(Enum):
     ROUGE = (0.9, 0, 0)
     ORANGE = (1, 0.5, 0)
     JAUNE = (1, 1, 0)
-    BLANC = (1, 1, 1)
+    BLANC = (0.9, 0.9, 0.9)
     
     LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
 
