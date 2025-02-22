@@ -85,7 +85,7 @@ class RubiksCube:
                     self.configuration[x][y][z] = listeDesCouleurs[indiceAInserer]
                     n += 1
 
-    def pivoterFace(self, nomFace:int=Faces.FRONT, sens=Sens.HORAIRE.value, distanceAuBord:int=1) -> None:
+    def pivoterFace(self, nomFace:int=Faces.FRONT, sens=Sens.HORAIRE, distanceAuBord:int=1) -> None:
         self.mouvementEnCours = True
         self.configurationAnterieure = copy.deepcopy(self.configuration)
 
@@ -99,23 +99,23 @@ class RubiksCube:
         
         for couronne in couronnesATourner:
             if nomFace == Faces.FRONT:
-                self.pivoterPlan(Axes.Y, couronne, -sens)
+                self.pivoterPlan(Axes.Y, couronne, -sens.value)
             elif nomFace == Faces.BACK:
-                self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.LEFT:
-                self.pivoterPlan(Axes.X, couronne, -sens)
+                self.pivoterPlan(Axes.X, couronne, -sens.value)
             elif nomFace == Faces.RIGHT:
-                self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.DOWN:
-                self.pivoterPlan(Axes.Z, couronne, -sens)
+                self.pivoterPlan(Axes.Z, couronne, -sens.value)
             else: # nomFace == Faces.UP:
-                self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens)
+                self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens.value)
 
 '''
 cube = RubiksCube(3)
 print(cube)
-cube.pivoterFace(Faces.DOWN, Sens.HORAIRE.value)
+cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
 print(cube)
-cube.pivoterFace(Faces.RIGHT, Sens.HORAIRE.value)
+cube.pivoterFace(Faces.RIGHT, Sens.HORAIRE)
 print(cube)
 '''
