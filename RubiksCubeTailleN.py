@@ -32,6 +32,7 @@ class RubiksCube:
         # Pour l'affichage des rotations :
         self.mouvementEnCours = False
         self.axeRotationEnCours = None # Axes.X, Axes.Y ou Axes.Z
+        self.sensRotationEnCours = 1
         self.abscisseFaceEnRotation:int = 0 # abscisse selon l'axe de rotation (peut être X, Y ou Z)
         self.angleRotationEnCours = 0 # en degrés
         self.configurationAnterieure = self.configuration
@@ -104,17 +105,22 @@ class RubiksCube:
         
         for couronne in couronnesATourner:
             if nomFace == Faces.FRONT:
+                self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.Y, couronne, -sens.value)
             elif nomFace == Faces.BACK:
+                self.sensRotationEnCours = -sens.value
                 self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.LEFT:
+                self.sensRotationEnCours = -sens.value
                 self.pivoterPlan(Axes.X, couronne, -sens.value)
             elif nomFace == Faces.RIGHT:
+                self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.DOWN:
+                self.sensRotationEnCours = -sens.value
                 self.pivoterPlan(Axes.Z, couronne, -sens.value)
             else: # nomFace == UP:
-
+                self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens.value)
 
 '''
