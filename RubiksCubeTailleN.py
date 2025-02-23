@@ -1,5 +1,7 @@
 from Enum import *
 import copy
+
+
 class RubiksCube:
     def __init__(self, taille:int=3):
         self.taille = taille # nombre de petits cubes sur une arête du Rubik's
@@ -29,7 +31,7 @@ class RubiksCube:
         
         # Pour l'affichage des rotations :
         self.mouvementEnCours = False
-        self.axeRotationEnCours = None # AXE_X, AXE_Y ou AXE_Z
+        self.axeRotationEnCours = None # Axes.X, Axes.Y ou Axes.Z
         self.abscisseFaceEnRotation:int = 0 # abscisse selon l'axe de rotation (peut être X, Y ou Z)
         self.angleRotationEnCours = 0 # en degrés
         self.configurationAnterieure = self.configuration
@@ -50,11 +52,11 @@ class RubiksCube:
             texte += '\n'
         return texte + '----------'
     
+
     def ajouterAction(self, action: tuple):
         self.listActions.append(action)
 
     def pivoterPlan(self, axe:int=Axes.X, abscisseFace:int=0, sens=Sens.HORAIRE) -> None:
-
         self.abscisseFaceEnRotation = abscisseFace
         xAParcourir = range(self.taille +2)
         yAParcourir = range(self.taille +2)
@@ -62,14 +64,12 @@ class RubiksCube:
         
         if axe == Axes.X:
             xAParcourir = [abscisseFace]
-
             self.axeRotationEnCours = Axes.X
-
         elif axe == Axes.Y:
             yAParcourir = [abscisseFace]
             sens *= -1 # car la base (y, x, z) est indirecte alors que (x, y, z) et (z, x, y) sont directes
             self.axeRotationEnCours = Axes.Y
-        else: # axe == AXE_Z:
+        else: # axe == Axes.Z:
             zAParcourir = [abscisseFace]
             self.axeRotationEnCours = Axes.Z
         
@@ -83,9 +83,9 @@ class RubiksCube:
         for x in xAParcourir:
             for y in yAParcourir:
                 for z in zAParcourir:
-                    if sens == Sens.ANTIHORAIRE:
+                    if sens == Sens.ANTIHORAIRE.value:
                         indiceAInserer = (n%(self.taille+2))*(self.taille+2) + self.taille+1 - n//(self.taille+2)
-                    else: # sens == SENS_HORAIRE:
+                    else: # sens == Sens.HORAIRE.value:
                         indiceAInserer = (self.taille+1-n%(self.taille+2))*(self.taille+2) + n//(self.taille+2)
                     self.configuration[x][y][z] = listeDesCouleurs[indiceAInserer]
                     n += 1
@@ -114,13 +114,14 @@ class RubiksCube:
             elif nomFace == Faces.DOWN:
                 self.pivoterPlan(Axes.Z, couronne, -sens.value)
             else: # nomFace == UP:
+
                 self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens.value)
 
-            
 '''
 cube = RubiksCube(3)
 print(cube)
-cube.pivoterFace(UP, SENS_HORAIRE)
+cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
 print(cube)
-cube.pivoterFace(RIGHT, SENS_HORAIRE)
-print(cube)'''
+cube.pivoterFace(Faces.RIGHT, Sens.HORAIRE)
+print(cube)
+'''

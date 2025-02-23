@@ -7,8 +7,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from Enum import *
+
 from Solver3D import *
 import RubiksCubeTailleN
+
 
 
 
@@ -20,7 +22,7 @@ def dessinerCarre(point1:tuple, point2:tuple, point3:tuple, point4:tuple, couleu
     glVertex3f(point4[0], point4[1], point4[2])
 
 
-def dessinerCube(origine:tuple, baseLocale:tuple, couleur) -> None:
+def dessinerCube(origine:tuple, baseLocale:tuple, couleur:tuple) -> None:
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[0][0], origine[1]+baseLocale[0][1], origine[2]+baseLocale[0][2]), (origine[0]+baseLocale[0][0]+baseLocale[1][0], origine[1]+baseLocale[0][1]+baseLocale[1][1], origine[2]+baseLocale[0][2]+baseLocale[1][2]), (origine[0]+baseLocale[1][0], origine[1]+baseLocale[1][1], origine[2]+baseLocale[1][2]), couleur) # Face avant
     dessinerCarre((origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), (origine[0]+baseLocale[0][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[2][2]), (origine[0]+baseLocale[0][0]+baseLocale[1][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[1][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[1][2]+baseLocale[2][2]), (origine[0]+baseLocale[1][0]+baseLocale[2][0], origine[1]+baseLocale[1][1]+baseLocale[2][1], origine[2]+baseLocale[1][2]+baseLocale[2][2]), couleur) # Face arrière
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[1][0], origine[1]+baseLocale[1][1], origine[2]+baseLocale[1][2]), (origine[0]+baseLocale[1][0]+baseLocale[2][0], origine[1]+baseLocale[1][1]+baseLocale[2][1], origine[2]+baseLocale[1][2]+baseLocale[2][2]), (origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), couleur) # Face gauche
@@ -29,7 +31,7 @@ def dessinerCube(origine:tuple, baseLocale:tuple, couleur) -> None:
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[0][0], origine[1]+baseLocale[0][1], origine[2]+baseLocale[0][2]), (origine[0]+baseLocale[0][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[2][2]), (origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), couleur) # Face inférieure
 
 
-def dessinerRubiksCube(rubiksCube):
+def dessinerRubiksCube(rubiksCube) -> None:
     glBegin(GL_QUADS)
     origine = (-(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2)
     
@@ -41,7 +43,7 @@ def dessinerRubiksCube(rubiksCube):
         xLocal = (math.cos(rubiksCube.angleRotationEnCours*math.pi/180), 0, math.sin(rubiksCube.angleRotationEnCours*math.pi/180))
         yLocal = (0, 1, 0)
         zLocal = (math.cos(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), 0, math.sin(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180))
-    else: # rubiksCube.axeRotationEnCours == AXE_Z:
+    else: # rubiksCube.axeRotationEnCours == Axes.Z:
         xLocal = (math.cos(rubiksCube.angleRotationEnCours*math.pi/180), math.sin(rubiksCube.angleRotationEnCours*math.pi/180), 0)
         yLocal = (math.cos(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), math.sin(math.pi/2 + rubiksCube.angleRotationEnCours*math.pi/180), 0)
         zLocal = (0, 0, 1)
@@ -83,24 +85,67 @@ def dessinerRubiksCube(rubiksCube):
                 elif rubiksCube.configurationAnterieure[x][y][z-1] != STRUCTURE:
                     couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y][z-1]]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]-0.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]-0.001*uZ[2]), couleur)
-
     glEnd()
     
 
-def afficherRubiksCube(rubiksCube):
+def tournerCube(angle:float, baseCamera:list, axe=Axes.X) -> tuple:
+    nouvelleBaseCamera = [(), (), ()]
+    glRotatef(-angle, baseCamera[axe.value][0], baseCamera[axe.value][1], baseCamera[axe.value][2])
+    
+    angle = angle*math.pi/180
+    cosinus = math.cos(angle) # cos(angle + pi/2) = -sin(angle)
+    sinus = math.sin(angle) # sin(angle + pi/2) = cos(angle)
+    
+    if axe == Axes.X:
+        nouvelleBaseCamera[1] = (cosinus*baseCamera[1][0] + sinus*baseCamera[2][0], cosinus*baseCamera[1][1] + sinus*baseCamera[2][1], cosinus*baseCamera[1][2] + sinus*baseCamera[2][2])
+        nouvelleBaseCamera[2] = (-sinus*baseCamera[1][0] + cosinus*baseCamera[2][0], -sinus*baseCamera[1][1] + cosinus*baseCamera[2][1], -sinus*baseCamera[1][2] + cosinus*baseCamera[2][2])
+        nouvelleBaseCamera[0] = baseCamera[0]
+    elif axe == Axes.Y:
+        nouvelleBaseCamera[2] = (cosinus*baseCamera[2][0] + sinus*baseCamera[0][0], cosinus*baseCamera[2][1] + sinus*baseCamera[0][1], cosinus*baseCamera[2][2] + sinus*baseCamera[0][2])
+        nouvelleBaseCamera[0] = (-sinus*baseCamera[2][0] + cosinus*baseCamera[0][0], -sinus*baseCamera[2][1] + cosinus*baseCamera[0][1], -sinus*baseCamera[2][2] + cosinus*baseCamera[0][2])
+        nouvelleBaseCamera[1] = baseCamera[1]
+    else: # axe == Axes.Z:
+        nouvelleBaseCamera[0] = (cosinus*baseCamera[0][0] + sinus*baseCamera[1][0], cosinus*baseCamera[0][1] + sinus*baseCamera[1][1], cosinus*baseCamera[0][2] + sinus*baseCamera[1][2])
+        nouvelleBaseCamera[1] = (-sinus*baseCamera[0][0] + cosinus*baseCamera[1][0], -sinus*baseCamera[0][1] + cosinus*baseCamera[1][1], -sinus*baseCamera[0][2] + cosinus*baseCamera[1][2])
+        nouvelleBaseCamera[2] = baseCamera[2]
+
+    return nouvelleBaseCamera
+
+
+def determinerPositionFacesCamera(baseCamera:tuple) -> list: # pour savoir quelles sont les faces devant, à gauche, à droite... depuis le point de vue de l'utilisateur
+    orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
+    directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
+    facesVuesParCamera = [None, None, None, None, None, None]
+    
+    for direction in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
+        produitScalaireMaxi = (directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[Faces.FRONT.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[Faces.FRONT.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[Faces.FRONT.value][2]
+        facesVuesParCamera[direction.value] = Faces.FRONT
+        
+        for face in [Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
+            produitScalaire = (directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[face.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[face.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[face.value][2]
+            if produitScalaire > produitScalaireMaxi:
+                produitScalaireMaxi = produitScalaire
+                facesVuesParCamera[direction.value] = face
+    
+    return facesVuesParCamera
+    
+
+def afficherRubiksCube(rubiksCube) -> None:
     pygame.init()
-    display = (800,600)
-    pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
+    dimensions = (800,600)
+    pygame.display.set_mode(dimensions, DOUBLEBUF|OPENGL)
     pygame.display.set_caption("Rubik's Cube")
     
-    gluPerspective(40, display[0]/display[1], 1, 50)
+    baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
+
+    gluPerspective(40, dimensions[0]/dimensions[1], 1, 50)
     glTranslatef(0,0,-10)
-    glRotatef(-30, 0,0,1)
-    angleRadiansZ = 30*math.pi/180
-    rotationX = math.cos(angleRadiansZ)
-    rotationY = math.sin(angleRadiansZ)
-    glRotatef(-60, rotationX, rotationY, 0)
     
+    baseCamera = tournerCube(-30, baseCamera, Axes.Y)
+    baseCamera = tournerCube(60, baseCamera, Axes.X)
+    
+    historiqueRotations = [(-30, baseCamera, Axes.Y), (60, baseCamera, Axes.X)] # Pour pouvoir réinitialiser la vue
+        
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
     
@@ -118,6 +163,14 @@ def afficherRubiksCube(rubiksCube):
         if len(rubiksCube.listActions) > 0 and (not rubiksCube.mouvementEnCours):
             rubiksCube.pivoterFace(rubiksCube.listActions[0][0], rubiksCube.listActions[0][1])
             del rubiksCube.listActions[0]
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE: # Réinitialisation de la vue
+                    for indice in range(len(historiqueRotations)-1, 1, -1):
+                        rotation = historiqueRotations[indice]
+                        baseCamera = tournerCube(-rotation[0], rotation[1], rotation[2])
+                    historiqueRotations = [(-30, baseCamera, Axes.Y), (60, baseCamera, Axes.X)]
+
                 
         clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
         if clicDroitMaintenu:
@@ -125,30 +178,46 @@ def afficherRubiksCube(rubiksCube):
             if positionClicSouris is None:
                 positionClicSouris = positionActuelle
             else:
-                glRotatef(int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS), 0,0,1)
-                angleRadiansZ -= int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS)*math.pi/180
-                glRotatef(int((positionActuelle[1] - positionClicSouris[1])*SENSIBILITE_SOURIS), rotationX, rotationY, 0)
-                rotationX = math.cos(angleRadiansZ)
-                rotationY = math.sin(angleRadiansZ)
+                deplacementHorizontal = int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS)
+                baseCamera = tournerCube(-deplacementHorizontal, baseCamera, Axes.Z)
+                historiqueRotations.append((-deplacementHorizontal, baseCamera, Axes.Z))
+                
+                deplacementVertical = int((positionActuelle[1] - positionClicSouris[1])*SENSIBILITE_SOURIS)
+                baseCamera = tournerCube(-deplacementVertical, baseCamera, Axes.X)
+                historiqueRotations.append((-deplacementVertical, baseCamera, Axes.X))
                 positionClicSouris = positionActuelle
         else:
             positionClicSouris = None
         
         keys = pygame.key.get_pressed()
+
         if True in keys:
+            if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
+                sensRotation = Sens.ANTIHORAIRE
+            else:
+                sensRotation = Sens.HORAIRE
+            
+            positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
+            
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.ajouterAction((Faces.UP, Sens.HORAIRE))
+                    sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.UP.value].value]
                 elif keys[pygame.K_d]:
                     rubiksCube.ajouterAction((Faces.DOWN, Sens.HORAIRE))
+                    sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.DOWN.value].value]
                 elif keys[pygame.K_l]:
                     rubiksCube.ajouterAction((Faces.LEFT, Sens.HORAIRE))
+                    sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.LEFT.value].value]
                 elif keys[pygame.K_r]:
                     rubiksCube.ajouterAction((Faces.RIGHT, Sens.HORAIRE))
+                    sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.RIGHT.value].value]
                 elif keys[pygame.K_f]:
                     rubiksCube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
+                    sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.FRONT.value].value]
                 elif keys[pygame.K_b]:
                     rubiksCube.ajouterAction((Faces.BACK, Sens.HORAIRE))
+                    sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.BACK.value].value]
                 if keys[pygame.K_j]:
                     jouerFormule([(Faces.RIGHT, Sens.HORAIRE), (Faces.RIGHT, Sens.HORAIRE), (Faces.UP, Sens.HORAIRE)], rubiksCube)
 
@@ -166,10 +235,11 @@ def afficherRubiksCube(rubiksCube):
                 angleRadiansZ -= 10*math.pi/180
                 rotationX = math.cos(angleRadiansZ)
                 rotationY = math.sin(angleRadiansZ)
+
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour
-                rubiksCube.angleRotationEnCours -= 10
+                rubiksCube.angleRotationEnCours -= sens*10 # "-" parce qu'OpenGL compte les angles dans le sens horaire et pas trigo
             else: # la rotation est terminée
                 rubiksCube.angleRotationEnCours = 0
                 rubiksCube.axeRotationEnCours = None
