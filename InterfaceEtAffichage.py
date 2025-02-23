@@ -218,8 +218,9 @@ def afficherRubiksCube(rubiksCube) -> None:
                 elif keys[pygame.K_b]:
                     rubiksCube.ajouterAction((Faces.BACK, Sens.HORAIRE))
                     sens = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.BACK.value].value]
-                if keys[pygame.K_j]:
-                    jouerFormule([(Faces.RIGHT, Sens.HORAIRE), (Faces.RIGHT, Sens.HORAIRE), (Faces.UP, Sens.HORAIRE)], rubiksCube)
+                if keys[pygame.K_s]:
+                    scramble = generateScrambleSubGroup()
+                    jouerFormule(scramble, rubiksCube)
 
             if keys[pygame.K_UP]:
                 glRotatef(-10, rotationX, rotationY, 0)
