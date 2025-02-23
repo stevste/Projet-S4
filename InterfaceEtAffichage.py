@@ -137,6 +137,7 @@ def afficherRubiksCube(rubiksCube) -> None:
     pygame.display.set_caption("Rubik's Cube")
     
     baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
+    sens = 0
 
     gluPerspective(40, dimensions[0]/dimensions[1], 1, 50)
     glTranslatef(0,0,-10)
@@ -190,7 +191,6 @@ def afficherRubiksCube(rubiksCube) -> None:
             positionClicSouris = None
         
         keys = pygame.key.get_pressed()
-
         if True in keys:
             if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
                 sensRotation = Sens.ANTIHORAIRE
@@ -198,7 +198,7 @@ def afficherRubiksCube(rubiksCube) -> None:
                 sensRotation = Sens.HORAIRE
             
             positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
-            
+
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.ajouterAction((Faces.UP, Sens.HORAIRE))
