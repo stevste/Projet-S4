@@ -32,3 +32,16 @@ class Couleur(Enum):
     LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
 
 SENSIBILITE_SOURIS = 0.3
+
+class Coins(Enum):
+    """Liste des coins hiérarchiser pour le solveur
+
+    """
+    URF = 0
+    UFL = 1
+    ULB = 2
+    UBR = 3
+    DFR = 4
+    DLF = 5
+    DBL = 6
+    DRB = 7
