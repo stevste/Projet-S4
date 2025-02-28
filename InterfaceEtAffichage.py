@@ -137,6 +137,7 @@ def afficherRubiksCube(rubiksCube) -> None:
     pygame.display.set_caption("Rubik's Cube")
     
     baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
+    angleRadiansZ = 0
 
     gluPerspective(40, dimensions[0]/dimensions[1], 1, 50)
     glTranslatef(0,0,-10)
