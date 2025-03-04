@@ -46,4 +46,18 @@ class Coins(Enum):
     DLF = 5
     DBL = 6
     DRB = 7
+
+class Aretes(Enum):
+    FU = 0
+    FR = 1
+    FD = 2
+    FL = 3
+    BU = 4
+    BR = 5
+    BD = 6
+    BL = 7
+    LU = 8
+    LD = 9
+    RU = 10
+    RD = 11
 NB_DE_PIXELS_DANS_UNE_UNITE = 82.73 # valeur empirique valable seulement pour cette perspective précise
