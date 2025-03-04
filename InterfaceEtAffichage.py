@@ -55,8 +55,8 @@ def dessinerRubiksCube(rubiksCube) -> None:
                     uX = xLocal
                     uY = yLocal
                     uZ = zLocal
-                    origineLocale = (x - (rubiksCube.taille+2)/2, y - (rubiksCube.taille+2)/2, z - (rubiksCube.taille+2)/2)
-                    origineCube = (origineLocale[0]*uX[0] + origineLocale[1]*uY[0] + origineLocale[2]*uZ[0], origineLocale[0]*uX[1] + origineLocale[1]*uY[1] + origineLocale[2]*uZ[1], origineLocale[0]*uX[2] + origineLocale[1]*uY[2] + origineLocale[2]*uZ[2])
+                    coordonneesCentrees = (x - (rubiksCube.taille+2)/2, y - (rubiksCube.taille+2)/2, z - (rubiksCube.taille+2)/2) # exemple pour un 3x3 : la "gomette" au centre de la face blanche devient (0, 0, 2) au lieu d'être (2, 2, 4)
+                    origineCube = (coordonneesCentrees[0]*uX[0] + coordonneesCentrees[1]*uY[0] + coordonneesCentrees[2]*uZ[0], coordonneesCentrees[0]*uX[1] + coordonneesCentrees[1]*uY[1] + coordonneesCentrees[2]*uZ[1], coordonneesCentrees[0]*uX[2] + coordonneesCentrees[1]*uY[2] + coordonneesCentrees[2]*uZ[2])
                 else:
                     uX = (1,0,0)
                     uY = (0,1,0)
@@ -66,7 +66,7 @@ def dessinerRubiksCube(rubiksCube) -> None:
                 couleur = (0.1, 0.1, 0.1) # Noir
                 dessinerCube(origineCube, (uX, uY, uZ), couleur)
         
-                # On colle les "gomettes" sur les faces des petits cubes :
+                # On colle les "gomettes" sur les faces du petit cube qu'on vient de dessiner :
                 if rubiksCube.configurationAnterieure[x+1][y][z] != STRUCTURE:
                     couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x+1][y][z]]
                     dessinerCarre((origineCube[0]+1.001*uX[0]+0.05*uY[0]+0.05*uZ[0], origineCube[1]+1.001*uX[1]+0.05*uY[1]+0.05*uZ[1], origineCube[2]+1.001*uX[2]+0.05*uY[2]+0.05*uZ[2]), (origineCube[0]+1.001*uX[0]+0.95*uY[0]+0.05*uZ[0], origineCube[1]+1.001*uX[1]+0.95*uY[1]+0.05*uZ[1], origineCube[2]+1.001*uX[2]+0.95*uY[2]+0.05*uZ[2]), (origineCube[0]+1.001*uX[0]+0.95*uY[0]+0.95*uZ[0], origineCube[1]+1.001*uX[1]+0.95*uY[1]+0.95*uZ[1], origineCube[2]+1.001*uX[2]+0.95*uY[2]+0.95*uZ[2]), (origineCube[0]+1.001*uX[0]+0.05*uY[0]+0.95*uZ[0], origineCube[1]+1.001*uX[1]+0.05*uY[1]+0.95*uZ[1], origineCube[2]+1.001*uX[2]+0.05*uY[2]+0.95*uZ[2]), couleur)                
@@ -115,7 +115,7 @@ def tournerCube(angle:float, baseCamera:list, axe=Axes.X) -> tuple:
 def determinerPositionFacesCamera(baseCamera:tuple) -> list: # pour savoir quelles sont les faces devant, à gauche, à droite... depuis le point de vue de l'utilisateur
     orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
     directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
-    facesVuesParCamera = [None, None, None, None, None, None]
+    facesVuesParCamera = [None, None, None, None, None, None] # sera rempli avec FRONT, BACK, RIGHT, LEFT, UP, DOWN
     
     for direction in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
         produitScalaireMaxi = (directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[Faces.FRONT.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[Faces.FRONT.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[Faces.FRONT.value][2]
@@ -132,14 +132,14 @@ def determinerPositionFacesCamera(baseCamera:tuple) -> list: # pour savoir quell
 
 def afficherRubiksCube(rubiksCube) -> None:
     pygame.init()
-    dimensions = (800,600)
-    pygame.display.set_mode(dimensions, DOUBLEBUF|OPENGL)
+    dimensionsEcran = (800,600)
+    pygame.display.set_mode(dimensionsEcran, DOUBLEBUF|OPENGL)
     pygame.display.set_caption("Rubik's Cube")
     
     baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
     angleRadiansZ = 0
 
-    gluPerspective(40, dimensions[0]/dimensions[1], 1, 50)
+    gluPerspective(40, dimensionsEcran[0]/dimensionsEcran[1], 1, 50)
     glTranslatef(0,0,-10)
     
     baseCamera = tournerCube(-30, baseCamera, Axes.Y)
@@ -190,6 +190,26 @@ def afficherRubiksCube(rubiksCube) -> None:
         else:
             positionClicSouris = None
         
+        clicGaucheMaintenu = pygame.mouse.get_pressed(num_buttons=3)[0]
+        if clicGaucheMaintenu:
+            positionSouris = pygame.mouse.get_pos()
+            positionCentree = [int(positionSouris[0] - dimensionsEcran[0]/2), int(-positionSouris[1] + dimensionsEcran[1]/2)]
+            print('souris', positionCentree)
+            baseCubeDansBaseCamera = ((baseCamera[0][0], baseCamera[1][0], baseCamera[2][0]), (baseCamera[0][1], baseCamera[1][1], baseCamera[2][1]), (baseCamera[0][2], baseCamera[1][2], baseCamera[2][2]))
+            positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
+            
+            coinBasGauche = [0,0,0]
+            for face in [positionFacesVuesParCamera[Faces.FRONT.value], positionFacesVuesParCamera[Faces.DOWN.value], positionFacesVuesParCamera[Faces.LEFT.value]]:
+                coordonnee = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
+                #print(Faces.AXES_ROTATION.value[face.value], coordonnee)
+                coinBasGauche[0] += int(NB_DE_PIXELS_DANS_UNE_UNITE*(baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][0]*coordonnee))
+                coinBasGauche[1] += int(NB_DE_PIXELS_DANS_UNE_UNITE*(baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][1]*coordonnee))
+                coinBasGauche[2] += int(NB_DE_PIXELS_DANS_UNE_UNITE*(baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][2]*coordonnee))
+            
+            print('coin', coinBasGauche)
+            print('difference', coinBasGauche[0]-positionCentree[0], coinBasGauche[2]-positionCentree[1])
+            
+        
         keys = pygame.key.get_pressed()
         if True in keys:
             if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
@@ -198,7 +218,6 @@ def afficherRubiksCube(rubiksCube) -> None:
                 sensRotation = Sens.HORAIRE
             
             positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
-
             if not rubiksCube.mouvementEnCours:
                 if keys[pygame.K_u]:
                     rubiksCube.ajouterAction((Faces.UP, Sens.HORAIRE))
@@ -249,7 +268,13 @@ def afficherRubiksCube(rubiksCube) -> None:
         
         glClearColor(0.3, 0.5, 0.5, 0)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        
+        '''
+        glBegin(GL_LINES)
+        glColor3f(1,0.5,0.5)
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[0][0]*4.835, baseCamera[0][1]*4.835, baseCamera[0][2]*4.835))
+        glEnd()
+        '''
         dessinerRubiksCube(rubiksCube)
         
         pygame.display.flip()

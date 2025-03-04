@@ -15,7 +15,9 @@ class Faces(Enum):
     UP = 4
     DOWN = 5
     
-    SIGNES_ABSCISSES = (1, -1, 1, -1, 1, -1) # 1 si la face a une abscisse positive par rapport à son axe de rotation, -1 sinon
+    AXES_ROTATION = (Axes.Y, Axes.Y, Axes.X, Axes.X, Axes.Z, Axes.Z)
+    SENS_ROTATIONS = (1, -1, 1, -1, 1, -1)
+    SIGNES_ABSCISSES = (-1, 1, 1, -1, 1, -1) # 1 si la face a une abscisse positive par rapport à son axe de rotation, -1 sinon
 
 class Sens(Enum):
     HORAIRE = 1
@@ -32,7 +34,6 @@ class Couleur(Enum):
     LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
 
 SENSIBILITE_SOURIS = 0.3
-
 class Coins(Enum):
     """Liste des coins hiérarchiser pour le solveur
 
@@ -45,3 +46,4 @@ class Coins(Enum):
     DLF = 5
     DBL = 6
     DRB = 7
+NB_DE_PIXELS_DANS_UNE_UNITE = 82.73 # valeur empirique valable seulement pour cette perspective précise
