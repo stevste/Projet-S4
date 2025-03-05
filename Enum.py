@@ -32,14 +32,11 @@ class Couleur(Enum):
     BLANC = (0.9, 0.9, 0.9)
     
     LIST = (BLEU, VERT, ROUGE, ORANGE, BLANC, JAUNE) # dans l'ordre FRONT, BACK, RIGHT, LEFT, UP, DOWN
-    #LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
 
 SENSIBILITE_SOURIS = 0.3
 
 class Coins(Enum):
-    """Liste des coins hiérarchisée pour le solveur
-
-    """
+    #Liste des coins hiérarchisée pour le solveur
     URF = 0
     UFL = 1
     ULB = 2

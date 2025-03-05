@@ -8,6 +8,10 @@ from OpenGL.GLU import *
 
 from Enum import *
 
+from Solver3D import *
+import RubiksCubeTailleN
+
+
 
 
 def dessinerCarre(point1:tuple, point2:tuple, point3:tuple, point4:tuple, couleur:tuple) -> None:
@@ -153,6 +157,7 @@ def afficherRubiksCube(rubiksCube) -> None:
     pygame.display.set_caption("Rubik's Cube")
     
     baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
+    angleRadiansZ = 0
 
     gluPerspective(40, dimensionsEcran[0]/dimensionsEcran[1], 6, 14)
     glTranslatef(0,0,-10)
@@ -175,6 +180,10 @@ def afficherRubiksCube(rubiksCube) -> None:
                 running = False
                 pygame.quit()
                 sys.exit()
+
+        if len(rubiksCube.listActions) > 0 and (not rubiksCube.mouvementEnCours):
+            rubiksCube.pivoterFace(rubiksCube.listActions[0][0], rubiksCube.listActions[0][1])
+            del rubiksCube.listActions[0]
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE: # Réinitialisation de la vue
@@ -182,6 +191,7 @@ def afficherRubiksCube(rubiksCube) -> None:
                         rotation = historiqueRotations[indice]
                         baseCamera = tournerCube(-rotation[0], rotation[1], rotation[2])
                     historiqueRotations = [(-30, baseCamera, Axes.Y), (60, baseCamera, Axes.X)]
+
                 
         clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
         if clicDroitMaintenu:
@@ -292,48 +302,55 @@ def afficherRubiksCube(rubiksCube) -> None:
             rubiksCube.caseCliqueeSurFaceFRONT = (None, None)
         
         keys = pygame.key.get_pressed()
-        if not rubiksCube.mouvementEnCours:
+        if True in keys:
             if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
                 sensRotation = Sens.ANTIHORAIRE
             else:
                 sensRotation = Sens.HORAIRE
             
             positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
-            if keys[pygame.K_u]:
-                rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.UP.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.UP.value].value]
-            elif keys[pygame.K_d]:
-                rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.DOWN.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.DOWN.value].value]
-            elif keys[pygame.K_l]:
-                rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.LEFT.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.LEFT.value].value]
-            elif keys[pygame.K_r]:
-                rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.RIGHT.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.RIGHT.value].value]
-            elif keys[pygame.K_f]:
-                rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.FRONT.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.FRONT.value].value]
-            elif keys[pygame.K_b]:
-                rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.BACK.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.BACK.value].value]
+            if not rubiksCube.mouvementEnCours:
+                if keys[pygame.K_u]:
+                    rubiksCube.ajouterAction((Faces.UP, Sens.HORAIRE))
+                    rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.UP.value].value]
+                elif keys[pygame.K_d]:
+                    rubiksCube.ajouterAction((Faces.DOWN, Sens.HORAIRE))
+                    rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.DOWN.value].value]
+                elif keys[pygame.K_l]:
+                    rubiksCube.ajouterAction((Faces.LEFT, Sens.HORAIRE))
+                    rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.LEFT.value].value]
+                elif keys[pygame.K_r]:
+                    rubiksCube.ajouterAction((Faces.RIGHT, Sens.HORAIRE))
+                    rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.RIGHT.value].value]
+                elif keys[pygame.K_f]:
+                    rubiksCube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
+                    rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.FRONT.value].value]
+                elif keys[pygame.K_b]:
+                    rubiksCube.ajouterAction((Faces.BACK, Sens.HORAIRE))
+                    rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SIGNES_ABSCISSES.value[positionFacesVuesParCamera[Faces.BACK.value].value]
+                if keys[pygame.K_s]:
+                    scramble = generateScrambleSubGroup()
+                    jouerFormule(scramble, rubiksCube)
 
-        if keys[pygame.K_UP]:
-            baseCamera = tournerCube(10, baseCamera, Axes.X)
-            historiqueRotations.append((10, baseCamera, Axes.X))
-        if keys[pygame.K_DOWN]:
-            baseCamera = tournerCube(-10, baseCamera, Axes.X)
-            historiqueRotations.append((-10, baseCamera, Axes.X))
-        if keys[pygame.K_LEFT]:
-            baseCamera = tournerCube(10, baseCamera, Axes.Z)
-            historiqueRotations.append((10, baseCamera, Axes.Z))
-        if keys[pygame.K_RIGHT]:
-            baseCamera = tournerCube(-10, baseCamera, Axes.Z)
-            historiqueRotations.append((-10, baseCamera, Axes.Z))
+            if keys[pygame.K_UP]:
+                glRotatef(-10, rotationX, rotationY, 0)
+            elif keys[pygame.K_DOWN]:
+                glRotatef(10, rotationX, rotationY, 0)
+            if keys[pygame.K_LEFT]:
+                glRotatef(-10, 0,0,1)
+                angleRadiansZ += 10*math.pi/180
+                rotationX = math.cos(angleRadiansZ)
+                rotationY = math.sin(angleRadiansZ)
+            elif keys[pygame.K_RIGHT]:
+                glRotatef(10, 0,0,1)
+                angleRadiansZ -= 10*math.pi/180
+                rotationX = math.cos(angleRadiansZ)
+                rotationY = math.sin(angleRadiansZ)
+
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour
-                rubiksCube.angleRotationEnCours -= sens*10 # "-" parce qu'OpenGL compte les angles dans le sens horaire et pas trigo
+                rubiksCube.angleRotationEnCours -= rubiksCube.sensRotationEnCours*10 # "-" parce qu'OpenGL compte les angles dans le sens horaire et pas trigo
             else: # la rotation est terminée
                 rubiksCube.angleRotationEnCours = 0
                 rubiksCube.axeRotationEnCours = None
@@ -342,13 +359,7 @@ def afficherRubiksCube(rubiksCube) -> None:
         
         glClearColor(0.3, 0.5, 0.5, 0)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        '''
-        glBegin(GL_LINES)
-        glColor3f(1,0.5,0.5)
-        glVertex3fv((baseCamera[0][0], baseCamera[0][1], baseCamera[0][2]))
-        glVertex3fv((baseCamera[0][0]*4.84, baseCamera[0][1]*4.84, baseCamera[0][2]*4.84))
-        glEnd()
-        '''
+        
         dessinerRubiksCube(rubiksCube)
         
         pygame.display.flip()
