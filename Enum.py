@@ -32,7 +32,6 @@ class Couleur(Enum):
     BLANC = (0.9, 0.9, 0.9)
     
     LIST = (BLEU, VERT, ROUGE, ORANGE, BLANC, JAUNE) # dans l'ordre FRONT, BACK, RIGHT, LEFT, UP, DOWN
-    #LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
 
 SENSIBILITE_SOURIS = 0.3
 
