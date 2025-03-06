@@ -2,7 +2,6 @@ from Enum import *
 import copy
 
 
-
 class RubiksCube:
     def __init__(self, taille:int=3):
         self.taille = taille # nombre de petits cubes sur une arête du Rubik's
