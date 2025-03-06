@@ -31,11 +31,12 @@ class Couleur(Enum):
     JAUNE = (1, 1, 0)
     BLANC = (0.9, 0.9, 0.9)
     
-    LIST = (VERT, BLEU, ROUGE, ORANGE, JAUNE, BLANC)
+    LIST = (BLEU, VERT, ROUGE, ORANGE, BLANC, JAUNE) # dans l'ordre FRONT, BACK, RIGHT, LEFT, UP, DOWN
 
 SENSIBILITE_SOURIS = 0.3
+
 class Coins(Enum):
-    """Liste des coins hiérarchiser pour le solveur
+    """Liste des coins hiérarchisée pour le solveur
 
     """
     URF = 0
@@ -60,4 +61,5 @@ class Aretes(Enum):
     LD = 9
     RU = 10
     RD = 11
-NB_DE_PIXELS_DANS_UNE_UNITE = 82.73 # valeur empirique valable seulement pour cette perspective précise
+    
+NB_DE_PIXELS_DANS_UNE_UNITE = 82.64 # valeur empirique valable seulement pour cette perspective précise
