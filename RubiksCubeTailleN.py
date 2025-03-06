@@ -94,9 +94,9 @@ class RubiksCube:
         self.configurationAnterieure = copy.deepcopy(self.configuration)
 
         if distanceAuBord == 1:
-            couronnesATourner = [0, 1] # on doit touner les "gomettes" sur la face et celles sur la tranche de la face
+            couronnesATourner = [0, 1] # on doit touner les "gommettes" sur la face et celles sur la tranche de la face
         elif 2 <= distanceAuBord <= self.taille//2:
-            couronnesATourner = [distanceAuBord] # on ne tourne que les "gomettes" sur la tranche
+            couronnesATourner = [distanceAuBord] # on ne tourne que les "gommettes" sur la tranche
         else:
             couronnesATourner = []
             self.mouvementEnCours = False
@@ -168,7 +168,7 @@ def test_coinsEtAretes():
     
 #test_coinsEtAretes()
 
-#cube = RubiksCube(3)
+#cube = RubiksCube()
 #cube.coinsEtAretes()
 '''print(cube)
 cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
