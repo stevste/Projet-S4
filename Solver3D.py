@@ -1,6 +1,13 @@
 import RubiksCubeTailleN
 import random
+import math
 from Enum import *
+
+def ApplyConfig(dest: RubiksCubeTailleN, src: list):
+    for i in range(0, len(src)):
+        for j in range(0, len(src[i])):
+            for k in range(0, len(src[i][j])):
+                dest.configuration[i][j][k] = src[i][j][k]
 
 def jouerFormule(formule: list, cube: RubiksCubeTailleN):
     for i in formule:
@@ -44,8 +51,30 @@ def generateScrambleSubGroup():
 
     return scramble
 
-def GetCornerPermCoord():
-    pass
+def moveUp(liste, top, bot):
+    save = liste[top]
+
+    for i in range(top, bot):
+        liste[i] = liste[i+1]
+    liste[bot] = save
+
+def ComparePiece(p1, p2):
+    for i in p2:
+        if i not in p1:
+            return False
+    return True
+
+def GetPermCoord(pieceList, ref):
+    coord = 0
+    perm = list(pieceList)
+    for i in range(len(ref)+1, 0, -1):
+        k = 0
+        while ComparePiece(perm[i], ref[i]):
+            moveUp(perm, 0, i)
+            k += 1
+        coord += k*math.factorial(i)
+
+    return coord
 
 def GetCornerOriCoord():
     pass
@@ -53,11 +82,16 @@ def GetCornerOriCoord():
 def GetUDSliceCoord():
     pass
 
-def GetEdgePermCoord():
-    pass
-
 def GetEdgeOriCoord():
     pass
 
 def PhaseTwo():
     pass
+
+def PhaseOne():
+    pass
+
+def Solve(cube: RubiksCubeTailleN):
+    clone = RubiksCubeTailleN()
+    refCorner, refEdges = clone.coinsEtAretes()
+    ApplyConfig(clone, cube.configuration)

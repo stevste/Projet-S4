@@ -61,5 +61,26 @@ class Aretes(Enum):
     LD = 9
     RU = 10
     RD = 11
+
+class Moves(Enum):
+    U1 = 0
+    U2 = 1
+    U3 = 2
+    D1 = 3
+    D2 = 4
+    D3 = 5
+    R1 = 6
+    R2 = 7
+    R3 = 8
+    L1 = 9
+    L2 = 10
+    L3 = 11
+    F1 = 12
+    F2 = 13
+    F3 = 14
+    B1 = 15
+    B2 = 16
+    B3 = 17
+    MOVELIST = [U1, U2, U3, D1, D2, D3, R1, R2, R3, L1, L2, L3, F1, F2, F3, B1, B2, B3]
     
 NB_DE_PIXELS_DANS_UNE_UNITE = 82.64 # valeur empirique valable seulement pour cette perspective précise
