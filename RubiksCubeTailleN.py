@@ -32,12 +32,13 @@ class RubiksCube:
         # Pour l'affichage des rotations :
         self.mouvementEnCours = False
         self.axeRotationEnCours = None # Axes.X, Axes.Y ou Axes.Z
+        self.sensRotationEnCours = 1
         self.abscisseFaceEnRotation:int = 0 # abscisse selon l'axe de rotation (peut être X, Y ou Z)
         self.angleRotationEnCours = 0 # en degrés
         self.configurationAnterieure = self.configuration
         
         # Pour la mise en rotation avec la souris :
-        self.caseCliqueeSurFaceFRONT = (None, None)
+        self.caseCliquee = [None, (None, None)] # [Face, (ligne, colonne)]
     
     def __repr__(self):
         texte = ''

@@ -14,7 +14,7 @@ class Faces(Enum):
     LEFT = 3
     UP = 4
     DOWN = 5
-    
+        
     AXES_ROTATION = (Axes.Y, Axes.Y, Axes.X, Axes.X, Axes.Z, Axes.Z)
     SENS_ROTATIONS = (1, -1, 1, -1, 1, -1)
     SIGNES_ABSCISSES = (-1, 1, 1, -1, 1, -1) # 1 si la face a une abscisse positive par rapport à son axe de rotation, -1 sinon
@@ -37,7 +37,7 @@ SENSIBILITE_SOURIS = 0.3
 
 class Coins(Enum):
     """Liste des coins hiérarchisée pour le solveur
-
+    Je me suis permis de m'en servir aussi :)
     """
     URF = 0
     UFL = 1

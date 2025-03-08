@@ -175,90 +175,117 @@ def estADroite(positionSouris:tuple, equationDroite:tuple) -> bool:
     return False
 
 
+def visible(face:Faces, baseCamera:list) -> bool:
+    orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
+    #directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
+    produitScalaire = round(-baseCamera[1][0]*orientationFaces[face.value][0] - baseCamera[1][1]*orientationFaces[face.value][1] - baseCamera[1][2]*orientationFaces[face.value][2], 2)
+    if produitScalaire >= 0:
+        return True
+    else:
+        return False
+    
+
 def rotationFace(positionCentree:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:
     baseCubeDansBaseCamera = ((baseCamera[0][0], baseCamera[1][0], baseCamera[2][0]), (baseCamera[0][1], baseCamera[1][1], baseCamera[2][1]), (baseCamera[0][2], baseCamera[1][2], baseCamera[2][2]))
+    
+    # Faces composant les coins (URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB):
+    coins = ((Faces.UP, Faces.RIGHT, Faces.FRONT), (Faces.UP, Faces.FRONT, Faces.LEFT), (Faces.UP, Faces.LEFT, Faces.BACK), (Faces.UP, Faces.BACK, Faces.RIGHT), (Faces.DOWN, Faces.FRONT, Faces.RIGHT), (Faces.DOWN, Faces.LEFT, Faces.FRONT), (Faces.DOWN, Faces.BACK, Faces.LEFT), (Faces.DOWN, Faces.RIGHT, Faces.BACK))
+    
+    # Toujours donnés dans l'ordre basGauche, basDroite, hautGauche, hautDroite pour la face considérée (pas besoin de la face BACK car elle n'est jamais visible):
+    coinsFaceFRONT = (Coins.DLF, Coins.DFR, Coins.UFL, Coins.URF)
+    coinsFaceRIGHT = (Coins.DFR, Coins.DRB, Coins.URF, Coins.UBR)
+    coinsFaceLEFT = (Coins.DBL, Coins.DLF, Coins.ULB, Coins.UFL)
+    coinsFaceUP = (Coins.UFL, Coins.URF, Coins.ULB, Coins.UBR)
+    coinsFaceDOWN = (Coins.DBL, Coins.DRB, Coins.DLF, Coins.DFR)
+    listeCoinsParFace = [coinsFaceFRONT, [], coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
+    
+    listeDesListesDeCoins = []
+    listeFaces = [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]
+    
+    for face in listeFaces:
+        listeCoinsFace = []    
+        if visible(positionFacesVuesParCamera[face.value], baseCamera):
+            for coin in listeCoinsParFace[face.value]:
+                coordonneesEtIntersections = [[0,0,0], []] # [position, intersection de 3 faces]
+                for faceEnIntersection in coins[coin.value]:
+                    coordonneesEtIntersections[1].append(positionFacesVuesParCamera[faceEnIntersection.value])
+                listeCoinsFace.append(coordonneesEtIntersections)
+        listeDesListesDeCoins.append(listeCoinsFace)
 
-    coinBasGauche = [[0,0,0], [positionFacesVuesParCamera[Faces.FRONT.value], positionFacesVuesParCamera[Faces.DOWN.value], positionFacesVuesParCamera[Faces.LEFT.value]]] # [position, intersection de 3 faces]
-    coinBasDroite = [[0,0,0], [positionFacesVuesParCamera[Faces.FRONT.value], positionFacesVuesParCamera[Faces.DOWN.value], positionFacesVuesParCamera[Faces.RIGHT.value]]] # [position, intersection de 3 faces]
-    coinHautGauche = [[0,0,0], [positionFacesVuesParCamera[Faces.FRONT.value], positionFacesVuesParCamera[Faces.UP.value], positionFacesVuesParCamera[Faces.LEFT.value]]] # [position, intersection de 3 faces]
-    coinHautDroite = [[0,0,0], [positionFacesVuesParCamera[Faces.FRONT.value], positionFacesVuesParCamera[Faces.UP.value], positionFacesVuesParCamera[Faces.RIGHT.value]]] # [position, intersection de 3 faces]
-    for coin in [coinBasGauche, coinBasDroite, coinHautGauche, coinHautDroite]:
-        positionCoinDansBaseCamera = coin[0]
-        for face in coin[1]:
-            coordonnee = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
-            positionCoinDansBaseCamera[0] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][0]*coordonnee)
-            positionCoinDansBaseCamera[1] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][1]*coordonnee)
-            positionCoinDansBaseCamera[2] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][2]*coordonnee)
-    vecteurChangementDeLigne = ((coinHautGauche[0][0]-coinBasGauche[0][0])/rubiksCube.taille, (coinHautGauche[0][2]-coinBasGauche[0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une ligne
-    vecteurChangementDeColonne = ((coinBasDroite[0][0]-coinBasGauche[0][0])/rubiksCube.taille, (coinBasDroite[0][2]-coinBasGauche[0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une colonne
-    
-    ligne = 0
-    while ligne <= rubiksCube.taille and estAuDessus(positionCentree, determinerEquationDroite((coinBasGauche[0][0] + vecteurChangementDeLigne[0]*ligne, coinBasGauche[0][2] + vecteurChangementDeLigne[1]*ligne), (coinBasDroite[0][0] + vecteurChangementDeLigne[0]*ligne, coinBasDroite[0][2] + vecteurChangementDeLigne[1]*ligne))):
-        ligne += 1
-    '''if ligne == 0 or ligne == rubiksCube.taille +1:
-        ligne = None # hors du cube'''
-    
-    colonne = 0
-    while colonne <= rubiksCube.taille and estADroite(positionCentree, determinerEquationDroite((coinBasGauche[0][0] + vecteurChangementDeColonne[0]*colonne, coinBasGauche[0][2] + vecteurChangementDeColonne[1]*colonne), (coinHautGauche[0][0] + vecteurChangementDeColonne[0]*colonne, coinHautGauche[0][2] + vecteurChangementDeColonne[1]*colonne))):
-        colonne += 1
-    '''if colonne == 0 or colonne == rubiksCube.taille +1:
-        colonne = None # hors du cube'''
-    
-    if rubiksCube.caseCliqueeSurFaceFRONT == (None, None):
-        if 1 <= ligne <= rubiksCube.taille and 1 <= colonne <= rubiksCube.taille:
-            rubiksCube.caseCliqueeSurFaceFRONT = (ligne, colonne)
-    else:
-        if 1 <= ligne <= rubiksCube.taille or 1 <= colonne <= rubiksCube.taille: # on peut potentiellement être en dehors du cube tant qu'on est au moins sur une ligne ou sur une colonne (<=> l'un des deux peut être en dehors mais pas les deux)
-            '''if ligne is None:
-                ligne = rubiksCube.caseCliqueeSurFaceFRONT[0]
-            elif colonne is None:
-                colonne = rubiksCube.caseCliqueeSurFaceFRONT[1]'''
-                
-            variationCase = (ligne-rubiksCube.caseCliqueeSurFaceFRONT[0], colonne-rubiksCube.caseCliqueeSurFaceFRONT[1])
-            rubiksCube.caseCliqueeSurFaceFRONT = (ligne, colonne)
-            if variationCase[0] != 0 and variationCase[0] != 1: # on rend la variation de ligne unitaire
-                variationCase = (abs(variationCase[0])/variationCase[0], variationCase[1])
-            if variationCase[1] != 0 and variationCase[1] != 1: # on rend la variation de colonne unitaire
-                variationCase = (variationCase[0], abs(variationCase[1])/variationCase[1])
+    for indexFaceVisible in range(len(listeDesListesDeCoins)):
+        listeCoinsDUneFaceVisible = listeDesListesDeCoins[indexFaceVisible]
+        for coin in listeCoinsDUneFaceVisible:
+            positionCoinDansBaseCamera = coin[0]
+            for face in coin[1]:
+                coordonnee = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
+                positionCoinDansBaseCamera[0] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][0]*coordonnee)
+                positionCoinDansBaseCamera[1] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][1]*coordonnee)
+                positionCoinDansBaseCamera[2] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][2]*coordonnee)
+        
+        if len(listeCoinsDUneFaceVisible) > 0 and ((rubiksCube.caseCliquee[0] != None and indexFaceVisible == rubiksCube.caseCliquee[0].value) or rubiksCube.caseCliquee[1] == (None, None)):
+            vecteurChangementDeLigne = ((listeCoinsDUneFaceVisible[2][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[2][0][2]-listeCoinsDUneFaceVisible[0][0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une ligne
+            vecteurChangementDeColonne = ((listeCoinsDUneFaceVisible[1][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[0][0][2]-listeCoinsDUneFaceVisible[0][0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une colonne
+                        
+            ligne = 0
+            while ligne <= rubiksCube.taille and estAuDessus(positionCentree, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[0][0][2] + vecteurChangementDeLigne[1]*ligne), (listeCoinsDUneFaceVisible[1][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[1][0][2] + vecteurChangementDeLigne[1]*ligne))):
+                ligne += 1
             
-            #print(ligne, colonne, variationCase)
-            if variationCase[0] != 0: # changement de ligne
-                if rubiksCube.caseCliqueeSurFaceFRONT[1]-variationCase[1] -1 <= rubiksCube.taille/2:
-                    if variationCase[0] == 1:
-                        sensDeRotation = Sens.ANTIHORAIRE
-                    else:
-                        sensDeRotation = Sens.HORAIRE
-                    #print('gauche', sensDeRotation, rubiksCube.caseCliqueeSurFaceFRONT[1]-variationCase[1])
-                    rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.LEFT.value], sensDeRotation, rubiksCube.caseCliqueeSurFaceFRONT[1]-variationCase[1])
-                    return sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.LEFT.value].value]
-
-                else:
-                    if variationCase[0] == 1:
-                        sensDeRotation = Sens.HORAIRE
-                    else:
-                        sensDeRotation = Sens.ANTIHORAIRE
-                    #print('droite', sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliqueeSurFaceFRONT[1]-variationCase[1] -1))
-                    rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.RIGHT.value], sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliqueeSurFaceFRONT[1]-variationCase[1] -1))
-                    return sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.RIGHT.value].value]
+            colonne = 0
+            while colonne <= rubiksCube.taille and estADroite(positionCentree, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[0][0][2] + vecteurChangementDeColonne[1]*colonne), (listeCoinsDUneFaceVisible[2][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[2][0][2] + vecteurChangementDeColonne[1]*colonne))):
+                colonne += 1
             
-            elif variationCase[1] != 0: # changement de colonne
-                if rubiksCube.caseCliqueeSurFaceFRONT[0] -1 <= rubiksCube.taille/2:
-                    if variationCase[1] == 1:
-                        sensDeRotation = Sens.HORAIRE
-                    else:
-                        sensDeRotation = Sens.ANTIHORAIRE
-                    #print('bas', sensDeRotation, rubiksCube.caseCliqueeSurFaceFRONT[0])
-                    rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.DOWN.value], sensDeRotation, rubiksCube.caseCliqueeSurFaceFRONT[0])
-                    return sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.DOWN.value].value]
-
-                else:
-                    if variationCase[1] == 1:
-                        sensDeRotation = Sens.ANTIHORAIRE
-                    else:
-                        sensDeRotation = Sens.HORAIRE
-                    #print('haut', sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliqueeSurFaceFRONT[0] -1))
-                    rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.UP.value], sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliqueeSurFaceFRONT[0] -1))
-                    return sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.UP.value].value]
+            if rubiksCube.caseCliquee[1] == (None, None):
+                if 1 <= ligne <= rubiksCube.taille and 1 <= colonne <= rubiksCube.taille:
+                    rubiksCube.caseCliquee = [listeFaces[indexFaceVisible], (ligne, colonne)]
+            else:
+                if 1 <= ligne <= rubiksCube.taille or 1 <= colonne <= rubiksCube.taille: # on peut potentiellement être en dehors du cube tant qu'on est au moins sur une ligne ou sur une colonne (<=> l'un des deux peut être en dehors mais pas les deux)
+                    variationCase = (ligne-rubiksCube.caseCliquee[1][0], colonne-rubiksCube.caseCliquee[1][1])
+                    rubiksCube.caseCliquee = [listeFaces[indexFaceVisible], (ligne, colonne)]
+                    if variationCase[0] != 0 and variationCase[0] != 1: # on rend la variation de ligne unitaire
+                        variationCase = (abs(variationCase[0])/variationCase[0], variationCase[1])
+                    if variationCase[1] != 0 and variationCase[1] != 1: # on rend la variation de colonne unitaire
+                        variationCase = (variationCase[0], abs(variationCase[1])/variationCase[1])
+                    
+                    positionRelativeFaces = [[Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN], [], [Faces.BACK, Faces.FRONT, Faces.UP, Faces.DOWN], [Faces.FRONT, Faces.BACK, Faces.UP, Faces.DOWN], [Faces.RIGHT, Faces.LEFT, Faces.BACK, Faces.FRONT], [Faces.RIGHT, Faces.LEFT, Faces.FRONT, Faces.BACK]]
+                    
+                    #print(ligne, colonne, variationCase)
+                    if variationCase[0] != 0: # changement de ligne
+                        if rubiksCube.caseCliquee[1][1]-variationCase[1] -1 <= rubiksCube.taille/2:
+                            if variationCase[0] == 1:
+                                sensDeRotation = Sens.ANTIHORAIRE
+                            else:
+                                sensDeRotation = Sens.HORAIRE
+                            #print('gauche', sensDeRotation, rubiksCube.caseCliquee[1][1]-variationCase[1])
+                            rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][1].value], sensDeRotation, rubiksCube.caseCliquee[1][1]-variationCase[1])
+                            rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][1].value].value]
+        
+                        else:
+                            if variationCase[0] == 1:
+                                sensDeRotation = Sens.HORAIRE
+                            else:
+                                sensDeRotation = Sens.ANTIHORAIRE
+                            #print('droite', sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][1]-variationCase[1] -1))
+                            rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][0].value], sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][1]-variationCase[1] -1))
+                            rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][0].value].value]
+                    
+                    elif variationCase[1] != 0: # changement de colonne
+                        if rubiksCube.caseCliquee[1][0] -1 <= rubiksCube.taille/2:
+                            if variationCase[1] == 1:
+                                sensDeRotation = Sens.HORAIRE
+                            else:
+                                sensDeRotation = Sens.ANTIHORAIRE
+                            #print('bas', sensDeRotation, rubiksCube.caseCliquee[1][0])
+                            rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][3].value], sensDeRotation, rubiksCube.caseCliquee[1][0])
+                            rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][3].value].value]
+        
+                        else:
+                            if variationCase[1] == 1:
+                                sensDeRotation = Sens.ANTIHORAIRE
+                            else:
+                                sensDeRotation = Sens.HORAIRE
+                            #print('haut', sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][0] -1))
+                            rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][2].value], sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][0] -1))
+                            rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][2].value].value]
 
     
 
@@ -328,9 +355,9 @@ def afficherRubiksCube(rubiksCube) -> None:
         if (clicGaucheMaintenu or keys[pygame.K_g]) and not rubiksCube.mouvementEnCours: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
             positionSouris = pygame.mouse.get_pos()
             positionCentree = [int(positionSouris[0] - dimensionsEcran[0]/2), int(-positionSouris[1] + dimensionsEcran[1]/2)]
-            sens = rotationFace(positionCentree, baseCamera, positionFacesVuesParCamera, rubiksCube)
+            rotationFace(positionCentree, baseCamera, positionFacesVuesParCamera, rubiksCube)
         else: # if not clicGaucheMaintenu
-            rubiksCube.caseCliqueeSurFaceFRONT = (None, None)
+            rubiksCube.caseCliquee = (None, (None, None)) # [Face, (ligne, colonne)]
         
         if not rubiksCube.mouvementEnCours:
             if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
@@ -340,22 +367,22 @@ def afficherRubiksCube(rubiksCube) -> None:
             
             if keys[pygame.K_u]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.UP.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.UP.value].value]
+                rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.UP.value].value]
             elif keys[pygame.K_d]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.DOWN.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.DOWN.value].value]
+                rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.DOWN.value].value]
             elif keys[pygame.K_l]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.LEFT.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.LEFT.value].value]
+                rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.LEFT.value].value]
             elif keys[pygame.K_r]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.RIGHT.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.RIGHT.value].value]
+                rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.RIGHT.value].value]
             elif keys[pygame.K_f]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.FRONT.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.FRONT.value].value]
+                rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.FRONT.value].value]
             elif keys[pygame.K_b]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.BACK.value], sensRotation)
-                sens = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.BACK.value].value]
+                rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.BACK.value].value]
 
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)
@@ -372,7 +399,7 @@ def afficherRubiksCube(rubiksCube) -> None:
         
         if rubiksCube.mouvementEnCours:
             if abs(rubiksCube.angleRotationEnCours) < 90: # la face n'a pas encore fait un quart de tour
-                rubiksCube.angleRotationEnCours -= sens*10 # "-" parce qu'OpenGL compte les angles dans le sens horaire et pas trigo
+                rubiksCube.angleRotationEnCours -= rubiksCube.sensRotationEnCours*10 # "-" parce qu'OpenGL compte les angles dans le sens horaire et pas trigo
             else: # la rotation est terminée
                 rubiksCube.angleRotationEnCours = 0
                 rubiksCube.axeRotationEnCours = None
