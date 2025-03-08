@@ -112,19 +112,48 @@ def determinerPositionFacesCamera(baseCamera:list) -> list: # pour savoir quelle
     orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
     directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
     facesVuesParCamera = [None, None, None, None, None, None] # sera rempli avec la face la plus proche de la position FRONT, BACK, RIGHT, LEFT, UP, DOWN pour l'observateur
-    
+
     for direction in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
-        produitScalaireMaxi = round((directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[Faces.FRONT.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[Faces.FRONT.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[Faces.FRONT.value][2], 2)
-        facesVuesParCamera[direction.value] = Faces.FRONT
-        
-        for face in [Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
+        #produitScalaireMaxi = round((directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[Faces.FRONT.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[Faces.FRONT.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[Faces.FRONT.value][2], 2)
+        produitScalaireMaxi = 0
+        #facesVuesParCamera[direction.value] = Faces.FRONT
+        for face in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
             produitScalaire = round((directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[face.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[face.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[face.value][2], 2)
             if produitScalaire >= produitScalaireMaxi and (face not in facesVuesParCamera): # le deuxième test sert en cas d'égalité de deux produits scalaires, pour ne pas avoir deux fois la même face dans la liste facesVuesParCamera
                 produitScalaireMaxi = produitScalaire
                 facesVuesParCamera[direction.value] = face
             
     return facesVuesParCamera
-    
+
+# Fonction pour faire des tests (même que celle au-dessus mais avec des print):
+def determinerPositionFacesCameraPrint(baseCamera:list) -> list: # pour savoir quelles sont les faces devant, à gauche, à droite... depuis le point de vue de l'utilisateur
+    orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
+    directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
+    facesVuesParCamera = [None, None, None, None, None, None] # sera rempli avec la face la plus proche de la position FRONT, BACK, RIGHT, LEFT, UP, DOWN pour l'observateur
+    print()
+    for direction in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
+        produitScalaireMaxi = 0
+        print('------')
+        for face in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
+            produitScalaire = round((directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[face.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[face.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[face.value][2], 2)
+            print(face, produitScalaire)
+            if produitScalaire >= produitScalaireMaxi and (face not in facesVuesParCamera): # le deuxième test sert en cas d'égalité de deux produits scalaires, pour ne pas avoir deux fois la même face dans la liste facesVuesParCamera
+                produitScalaireMaxi = produitScalaire
+                facesVuesParCamera[direction.value] = face
+            
+    return facesVuesParCamera
+
+# Fonction de vérification :
+def verifierCoherence(facesVuesParCamera:list) -> bool:
+    if abs(facesVuesParCamera[0].value-facesVuesParCamera[1].value) == 1 and abs(facesVuesParCamera[2].value-facesVuesParCamera[3].value) == 1 and abs(facesVuesParCamera[4].value-facesVuesParCamera[5].value) == 1:
+        for indiceFace1 in range(len(facesVuesParCamera)):
+            for face2 in facesVuesParCamera[0:indiceFace1] + facesVuesParCamera[indiceFace1 +1:]:
+                if facesVuesParCamera[indiceFace1] == face2:
+                    return False
+        return True
+    else:
+        return False
+
 
 def determinerEquationDroite(point1:tuple, point2:tuple) -> tuple: # équation "ax + by + c = 0" de la droite passant par les deux points donnés, renvoie a, b et c en pixels
     vecteurDirecteur = (point1[0] - point2[0], point1[1] - point2[1]) # (xb - xa, yb - ya)
@@ -184,10 +213,12 @@ def afficherRubiksCube(rubiksCube) -> None:
                     historiqueRotations = [(-30, baseCamera, Axes.Y), (60, baseCamera, Axes.X)]
                 
                 if event.key == pygame.K_i: # info, on peut y mettre n'importe quel print d'une variable pour faire des tests
-                    print(determinerPositionFacesCamera(baseCamera))
+                    print(determinerPositionFacesCameraPrint(baseCamera))
         
         keys = pygame.key.get_pressed()      
         positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
+        if not verifierCoherence(positionFacesVuesParCamera):
+            print("ATTENTION : problème de cohérence des faces vues par la caméra !")
         
         clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
         if clicDroitMaintenu or keys[pygame.K_h]: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
