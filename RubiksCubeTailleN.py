@@ -140,17 +140,17 @@ class RubiksCube:
                  (c[self.taille+1][1][1], c[self.taille][1][0], c[self.taille][0][1])] # DRB
             
         aretes = [(c[1][self.taille+1][2], c[0][self.taille][2]), # FU
-                  (c[2][self.taille+1][1], c[2][self.taille][0]), # FR
                   (c[self.taille][self.taille+1][2], c[self.taille+1][self.taille][2]), # FD
-                  (c[2][self.taille+1][self.taille], c[2][self.taille][self.taille+1]), # FL
                   (c[1][0][2], c[0][1][2]), # BU
-                  (c[2][0][1], c[2][1][0]), # BR
                   (c[self.taille][0][2], c[self.taille+1][1][2]), # BD
-                  (c[2][0][self.taille], c[2][1][self.taille+1]), # BL
                   (c[1][2][self.taille+1], c[0][2][self.taille]), # LU
                   (c[self.taille][2][self.taille+1], c[self.taille+1][2][self.taille]), # LD
                   (c[1][2][0], c[0][2][1]), # RU
-                  (c[self.taille][2][0], c[self.taille+1][2][1])] # RD
+                  (c[self.taille][2][0], c[self.taille+1][2][1]), #RD
+                  (c[2][self.taille+1][1], c[2][self.taille][0]), # FR
+                  (c[2][self.taille+1][self.taille], c[2][self.taille][self.taille+1]), # FL
+                  (c[2][0][self.taille], c[2][1][self.taille+1]), # BL
+                  (c[2][0][1], c[2][1][0])] # BR
         
         return coins, aretes
 

@@ -50,17 +50,17 @@ class Coins(Enum):
 
 class Aretes(Enum):
     FU = 0
-    FR = 1
-    FD = 2
-    FL = 3
-    BU = 4
-    BR = 5
-    BD = 6
-    BL = 7
-    LU = 8
-    LD = 9
-    RU = 10
-    RD = 11
+    FD = 1
+    BU = 2
+    BD = 3
+    LU = 4
+    LD = 5
+    RU = 6
+    RD = 7
+    FR = 8
+    FL = 9
+    BL = 10
+    BR = 11
 
 class Moves(Enum):
     U1 = 0
@@ -83,4 +83,7 @@ class Moves(Enum):
     B3 = 17
     MOVELIST = [U1, U2, U3, D1, D2, D3, R1, R2, R3, L1, L2, L3, F1, F2, F3, B1, B2, B3]
     
+class CoordMod(Enum):
+    EDGE = 2
+    CORNER = 3
 NB_DE_PIXELS_DANS_UNE_UNITE = 82.64 # valeur empirique valable seulement pour cette perspective précise

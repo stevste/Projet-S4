@@ -9,7 +9,7 @@ from OpenGL.GLU import *
 from Enum import *
 
 from Solver3D import *
-#import RubiksCubeTailleN
+import RubiksCubeTailleN
 
 
 
@@ -331,6 +331,11 @@ def afficherRubiksCube(rubiksCube) -> None:
             if keys[pygame.K_s]:
                 scramble = generateScrambleSubGroup()
                 jouerFormule(scramble, rubiksCube)
+            if keys[pygame.K_c]:
+                ref = RubiksCubeTailleN.RubiksCube()
+                cornRef, edgeRef = ref.coinsEtAretes()
+                cornActual, edgeActual = rubiksCube.coinsEtAretes()
+                print((GetPermCoord(cornActual, cornRef), GetPermCoord(edgeActual, edgeRef), GetOriCoord(cornActual, cornRef, CoordMod.CORNER), GetOriCoord(edgeActual, edgeRef, CoordMod.EDGE)))
 
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)
