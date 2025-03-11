@@ -335,7 +335,7 @@ def afficherRubiksCube(rubiksCube) -> None:
                 ref = RubiksCubeTailleN.RubiksCube()
                 cornRef, edgeRef = ref.coinsEtAretes()
                 cornActual, edgeActual = rubiksCube.coinsEtAretes()
-                print((GetPermCoord(cornActual, cornRef), GetPermCoord(edgeActual, edgeRef), GetOriCoord(cornActual, cornRef, CoordMod.CORNER), GetOriCoord(edgeActual, edgeRef, CoordMod.EDGE)))
+                print((GetPermCoord(cornActual, cornRef), GetPermCoord(edgeActual, edgeRef), GetOriCoord(cornActual, cornRef, CoordMod.CORNER), GetOriCoord(edgeActual, edgeRef, CoordMod.EDGE), GetUDSliceCoord(edgeActual, edgeRef)))
 
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)
