@@ -150,6 +150,7 @@ def estADroite(positionSouris:tuple, equationDroite:tuple) -> bool:
 
 
 def afficherRubiksCube(rubiksCube) -> None:
+    refC, refE = rubiksCube.coinsEtAretes()
     pygame.init()
     dimensionsEcran = (800,600)
     pygame.display.set_mode(dimensionsEcran, DOUBLEBUF|OPENGL)
@@ -332,9 +333,12 @@ def afficherRubiksCube(rubiksCube) -> None:
                 scramble = generateScrambleSubGroup()
                 jouerFormule(scramble, rubiksCube)
             if keys[pygame.K_t]:
-                m = int(input("numero move"))
-                ApplyMove(m, rubiksCube)
-                #Solve(rubiksCube)
+                c, e = rubiksCube.coinsEtAretes()
+                #print(GetEdgePermCoord(e, refE))
+                Solve(rubiksCube)
+            if keys[pygame.K_c]:
+                c, e = rubiksCube.coinsEtAretes()
+                print(GetCornerPermCoord(c, refC))
 
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)

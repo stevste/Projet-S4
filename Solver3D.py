@@ -4,8 +4,50 @@ import math
 from Enum import *
 
 def jouerFormule(formule: list, cube: RubiksCube):
-    for i in formule:
-        cube.ajouterAction(i)
+    for m in formule:
+        match m:
+            case Moves.U1.value:
+                cube.ajouterAction((Faces.UP, Sens.HORAIRE))
+            case Moves.U2.value:
+                cube.ajouterAction((Faces.UP, Sens.HORAIRE))
+                cube.ajouterAction((Faces.UP, Sens.HORAIRE))
+            case Moves.U3.value:
+                cube.ajouterAction((Faces.UP, Sens.ANTIHORAIRE))
+            case Moves.D1.value:
+                cube.ajouterAction((Faces.DOWN, Sens.HORAIRE))
+            case Moves.D2.value:
+                cube.ajouterAction((Faces.DOWN, Sens.HORAIRE))
+                cube.ajouterAction((Faces.DOWN, Sens.HORAIRE))
+            case Moves.D3.value:
+                cube.ajouterAction(Faces.DOWN, Sens.ANTIHORAIRE)
+            case Moves.R1.value:
+                cube.ajouterAction((Faces.RIGHT, Sens.HORAIRE))
+            case Moves.R2.value:
+                cube.ajouterAction((Faces.RIGHT, Sens.HORAIRE))
+                cube.ajouterAction((Faces.RIGHT, Sens.HORAIRE))
+            case Moves.R3.value:
+                cube.ajouterAction((Faces.RIGHT, Sens.ANTIHORAIRE))
+            case Moves.L1.value:
+                cube.ajouterAction((Faces.LEFT, Sens.HORAIRE))
+            case Moves.L2.value:
+                cube.ajouterAction((Faces.LEFT, Sens.HORAIRE))
+                cube.ajouterAction((Faces.LEFT, Sens.HORAIRE))
+            case Moves.L3.value:
+                cube.ajouterAction((Faces.LEFT, Sens.ANTIHORAIRE))
+            case Moves.F1.value:
+                cube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
+            case Moves.F2.value:
+                cube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
+                cube.ajouterAction((Faces.FRONT, Sens.HORAIRE))
+            case Moves.F3.value:
+                cube.ajouterAction((Faces.FRONT, Sens.ANTIHORAIRE))
+            case Moves.B1.value:
+                cube.ajouterAction((Faces.BACK, Sens.HORAIRE))
+            case Moves.B2.value:
+                cube.ajouterAction((Faces.BACK, Sens.HORAIRE))
+                cube.ajouterAction((Faces.BACK, Sens.HORAIRE))
+            case Moves.B3.value:
+                cube.ajouterAction((Faces.BACK, Sens.ANTIHORAIRE))
 
 def generateScrambleSubGroup():
     scramble = []
@@ -23,7 +65,7 @@ def generateScrambleSubGroup():
         elif move == 1:
             sens = random.randint(0, 1)
             if sens == 0:
-                scramble.append((Faces.DOWN, Sens.HORAIRE))
+                scramble.append(((Faces.DOWN, Sens.HORAIRE)))
             else:
                 scramble.append((Faces.DOWN, Sens.ANTIHORAIRE))
         
@@ -55,10 +97,10 @@ def ApplyMove(m: Moves, cube: RubiksCube):
         case Moves.U3.value:
             cube.pivoterFace(Faces.UP, Sens.ANTIHORAIRE)
         case Moves.D1.value:
-            cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
+            cube.pivoterFace((Faces.DOWN, Sens.HORAIRE))
         case Moves.D2.value:
-            cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
-            cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
+            cube.pivoterFace((Faces.DOWN, Sens.HORAIRE))
+            cube.pivoterFace((Faces.DOWN, Sens.HORAIRE))
         case Moves.D3.value:
             cube.pivoterFace(Faces.DOWN, Sens.ANTIHORAIRE)
         case Moves.R1.value:
@@ -91,9 +133,14 @@ def ApplyMove(m: Moves, cube: RubiksCube):
             cube.pivoterFace(Faces.BACK, Sens.ANTIHORAIRE)
 
 def ApplyConfig(dest: RubiksCube, src: list):
+    cpy = []
     for i in range(0, len(src)):
+        cpy.append([])
         for j in range(0, len(src[i])):
-            dest.configuration[i][j] = list(src[i][j])
+            cpy[i].append([])
+            for k in range(0, len(src[i][j])):
+                cpy[i][j].append(src[i][j][k])
+    dest.configuration = cpy
 
 def CompareConfig(config1, config2):
     for i in range(0, len(config1)):
@@ -118,12 +165,11 @@ def ComparePiece(p1, p2):
 
 def GetCornerPermCoord(pieceList, ref):
     coord = 0
-    perm = list(pieceList)
     for i in range(len(pieceList)-1, 0, -1):
         k = 0
-        while not ComparePiece(perm[i], ref[i]):
-            moveUp(perm, 0, i)
-            k += 1
+        j=0
+        while not ComparePiece(pieceList[i], ref[j]):
+            pass
         coord += k*math.factorial(i)
 
     return coord
@@ -178,7 +224,7 @@ def GetUDSliceCoord(edgeList, refEdge):
 
 def PhaseTwo(cube: RubiksCube, refCorner, refEdges):
     def GetLenght(coordP2):
-        return coordP2[0]/40319 + coordP2[1]/40319 + coordP2[2]/23
+        return coordP2[0] + coordP2[1] + coordP2[2]
     
     actualCorner, actualEdge = cube.coinsEtAretes()
     solve = False
@@ -204,13 +250,13 @@ def PhaseTwo(cube: RubiksCube, refCorner, refEdges):
                 if m not in [Moves.R1.value, Moves.R3.value, Moves.L1.value, Moves.L3.value, Moves.F1.value, Moves.F3.value, Moves.B1.value, Moves.B3.value]:
                     ApplyMove(m, cube)
                     inClose = False
-                    for c in close:
+                    for c in (close + open):
                         if CompareConfig(cube.configuration, c[0]):
                             inClose = True
                     
                     if not inClose:
                         newCorners, newEdges = cube.coinsEtAretes()
-                        coordP2 = (GetPermCoord(newCorners, refCorner), GetPermCoord(newEdges, refEdges), GetUDSliceCoord(newEdges, refEdges))
+                        coordP2 = (GetCornerPermCoord(newCorners, refCorner), GetEdgePermCoord(newEdges, refEdges), GetUDSliceCoord(newEdges, refEdges))
                         open.append((cube.configuration, minConfig, coordP2, m))
                     ApplyConfig(cube, minConfig)
             
@@ -232,8 +278,7 @@ def GetResultAstar(tree: list):
             if i[0] == tree[currentIndex][1]:
                 result.append(tree[currentIndex][3])
                 currentIndex = tree.index(i)
-    return result
-
+    return list(reversed(result))
 
 def PhaseOne():
     pass
@@ -243,4 +288,4 @@ def Solve(cube: RubiksCube):
     refCorner, refEdges = clone.coinsEtAretes()
     ApplyConfig(clone, cube.configuration)
     sequence = PhaseTwo(clone, refCorner, refEdges)
-    print(sequence)
+    jouerFormule(sequence, cube)
