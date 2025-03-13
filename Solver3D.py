@@ -93,8 +93,7 @@ def ApplyMove(m: Moves, cube: RubiksCube):
 def ApplyConfig(dest: RubiksCube, src: list):
     for i in range(0, len(src)):
         for j in range(0, len(src[i])):
-            for k in range(0, len(src[i][j])):
-                dest.configuration[i][j][k] = src[i][j][k]
+            dest.configuration[i][j] = list(src[i][j])
 
 def CompareConfig(config1, config2):
     for i in range(0, len(config1)):
@@ -117,12 +116,29 @@ def ComparePiece(p1, p2):
             return False
     return True
 
-def GetPermCoord(pieceList, ref):
+def GetCornerPermCoord(pieceList, ref):
     coord = 0
     perm = list(pieceList)
     for i in range(len(pieceList)-1, 0, -1):
         k = 0
         while not ComparePiece(perm[i], ref[i]):
+            moveUp(perm, 0, i)
+            k += 1
+        coord += k*math.factorial(i)
+
+    return coord
+
+def GetEdgePermCoord(pieceList, ref):
+    coord = 0
+    perm = list(pieceList)
+    for i in range(7, 0, -1):
+        k = 0
+        isUD = True
+        for j in range(8, 12):
+            if ComparePiece(perm[i], ref[j]):
+                isUD = False
+
+        while not ComparePiece(perm[i], ref[i]) and isUD:
             moveUp(perm, 0, i)
             k += 1
         coord += k*math.factorial(i)
@@ -162,11 +178,11 @@ def GetUDSliceCoord(edgeList, refEdge):
 
 def PhaseTwo(cube: RubiksCube, refCorner, refEdges):
     def GetLenght(coordP2):
-        return coordP2[0] + coordP2[1] + coordP2[2]
+        return coordP2[0]/40319 + coordP2[1]/40319 + coordP2[2]/23
     
     actualCorner, actualEdge = cube.coinsEtAretes()
     solve = False
-    coordP2 = (GetPermCoord(actualCorner, refCorner), GetPermCoord(actualEdge, refEdges), GetUDSliceCoord(actualEdge, refEdges))
+    coordP2 = (GetCornerPermCoord(actualCorner, refCorner), GetEdgePermCoord(actualEdge, refEdges), GetUDSliceCoord(actualEdge, refEdges))
     open = [(cube.configuration, None, coordP2, None)]
     close = []
     minimalIndex = 0
