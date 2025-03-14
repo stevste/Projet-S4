@@ -44,11 +44,12 @@ class Bouton:
 
 
 class Piece:
-    def __init__(self, position:tuple, couleur:tuple, texte:str):
+    def __init__(self, position:tuple, couleur:tuple, valeur:int):
         self.position = position # [x,y] en pixels
         self.positionArrivee = position
         self.couleur = couleur
-        self.texte = texte
+        self.valeur = valeur
+        self.texte = str(self.valeur)
     
     def dessiner(self, screen) -> None:
         pygame.draw.rect(screen, self.couleur, pygame.Rect(self.position[0], self.position[1], COTE_CASES, COTE_CASES), 0, int(0.3*COTE_CASES))
@@ -208,13 +209,13 @@ class Grille:
         for ligne in range(len(self.pieces)):
             configuration.append([])
             for colonne in range(len(self.pieces[0])):
-                configuration[ligne].append(self.pieces[ligne][colonne].texte)
+                configuration[ligne].append(self.pieces[ligne][colonne].valeur)
         return configuration
     
-    def determinerConfigDistanceMinimale(self, listeOuverte:list) -> tuple:
+    def determinerMeilleureConfig(self, listeOuverte:list) -> tuple:
         proprietesConfigDistMini = listeOuverte[0]
         for proprietesConfigEtudiee in listeOuverte[1:]: # (config, distance, parent)
-            if proprietesConfigEtudiee[1] < proprietesConfigDistMini[1]:
+            if proprietesConfigEtudiee[1][0] < proprietesConfigDistMini[1][0]:
                 proprietesConfigDistMini = proprietesConfigEtudiee
         return proprietesConfigDistMini
     
@@ -224,15 +225,23 @@ class Grille:
             for colonne in range(len(config[0])):
                 for l in range(len(self.pieces)):
                     for c in range(len(self.pieces[0])):
-                        if self.pieces[l][c].texte == config[ligne][colonne]:
+                        if self.pieces[l][c].valeur == config[ligne][colonne]:
                             config[ligne][colonne] = self.pieces[l][c]
         self.pieces = config
     
-    def estimerNombreCoupsRestantAJouer(self, configuration:list):
-        return 0
+    def estimerNombreCoupsRestantAJouer(self, configuration:list, solutionCherchee:list):
+        sommeDistances = 0
+        for ligne in range(len(solutionCherchee)):
+            for colonne in range(len(solutionCherchee[0])):
+                for l in range(len(configuration)):
+                    for c in range(len(configuration[0])):
+                        if solutionCherchee[ligne][colonne] == configuration[l][c]:
+                            sommeDistances += abs(ligne-l) + abs(colonne-c)
+        return sommeDistances
         
-    def proprietes(self, configuration:list, distance:int):
-        valeurHeuristique = self.estimerNombreCoupsRestantAJouer(configuration)
+    def proprietes(self, configuration:list, distance:int, solutionCherchee:list):
+        valeurHeuristique = self.estimerNombreCoupsRestantAJouer(configuration, solutionCherchee)
+        #print('heuristique', valeurHeuristique)
         return (valeurHeuristique + distance, distance, valeurHeuristique)
     
     def rechercherIndiceConfiguration(self, configCherchee:list, liste:list) -> int:
@@ -249,17 +258,21 @@ class Grille:
             proprietesConfig = listeFermee[index]
         return sequenceRotations
         
-    def aEtoile(self) -> list:
-        listeOuverte = [(self.configActuelle(), (0,0,0), None, -1)] # configurations à étudier
+    def aEtoile(self, solutionCherchee:list=[[1, 2, 3], [4, 5, 6], [7, 8, 9]]) -> list:
+        configDepart = self.configActuelle()
+        listeOuverte = [(configDepart, self.proprietes(configDepart, 0, solutionCherchee), None, -1)] # configurations à étudier
         listeFermee = [] # configurations déjà étudiées
         solutionTrouvee = False
         
         while not solutionTrouvee and len(listeOuverte) > 0:
-            proprietesConfigEtudiee = self.determinerConfigDistanceMinimale(listeOuverte)
+            proprietesConfigEtudiee = self.determinerMeilleureConfig(listeOuverte)
             listeOuverte.remove(proprietesConfigEtudiee)
             listeFermee.append(proprietesConfigEtudiee)
-            print(len(listeFermee), len(listeOuverte), proprietesConfigEtudiee[1])
-            if proprietesConfigEtudiee[0] == [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]:
+            #print(proprietesConfigEtudiee)
+            #print(len(listeFermee), len(listeOuverte), proprietesConfigEtudiee[1])
+            
+            if proprietesConfigEtudiee[0] == solutionCherchee:
+                #print('trouvé')
                 solutionTrouvee = True
             
             self.disposerPieces(proprietesConfigEtudiee[0])
@@ -296,7 +309,7 @@ class Grille:
             
             listeRotations = [rotation1Horaire, rotation1Antihoraire, rotation2Horaire, rotation2Antihoraire, rotation3Horaire, rotation3Antihoraire, rotation4Horaire, rotation4Antihoraire]
             for configSuivante in listeRotations:
-                proprietesConfigSuivante = (configSuivante, self.proprietes(configSuivante, proprietesConfigEtudiee[1][1] +1), proprietesConfigEtudiee[0], listeRotations.index(configSuivante)) # (config, propriétés, configParent, rotationEffectuee)
+                proprietesConfigSuivante = (configSuivante, self.proprietes(configSuivante, proprietesConfigEtudiee[1][1] +1, solutionCherchee), proprietesConfigEtudiee[0], listeRotations.index(configSuivante)) # (config, propriétés, configParent, rotationEffectuee)
                 if self.rechercherIndiceConfiguration(configSuivante, listeFermee) == -1: # la configuration n'a pas encore été étudiée
                     index = self.rechercherIndiceConfiguration(configSuivante, listeOuverte)
                     if index == -1: # la config n'est pas dans la liste Ouverte
@@ -323,7 +336,7 @@ pygame.init()
 screen = pygame.display.set_mode([850, 650]) # taille fenêtre  
 pygame.display.set_caption("Pivot INP P12")
 
-grille = Grille([['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']])
+grille = Grille([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 boutonSolveur = Bouton((368, 580), "Résoudre", (110, 30), (40, 170, 60), 30, (10, 6))
 
 anciennePositionSouris = None
