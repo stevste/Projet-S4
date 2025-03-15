@@ -184,24 +184,6 @@ def visible(face:Faces, baseCamera:list) -> bool:
     
 
 def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:
-    '''# get mouse position
-    x, y = pygame.mouse.get_pos()
-    
-    # get the fragment depth
-    depth = glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT)
-    
-    # get projection matrix, view matrix and the viewport rectangle
-    model_view = np.array(glGetDoublev(GL_MODELVIEW_MATRIX))
-    proj = np.array(glGetDoublev(GL_PROJECTION_MATRIX))
-    view = np.array(glGetIntegerv(GL_VIEWPORT))
-    
-    # unproject the point
-    point = gluUnProject(x, y, depth, model_view, proj, view)
-    print(round(point[0], 2), round(point[1], 2), round(point[2], 2))'''
-    
-    
-    baseCubeDansBaseCamera = ((baseCamera[0][0], baseCamera[1][0], baseCamera[2][0]), (baseCamera[0][1], baseCamera[1][1], baseCamera[2][1]), (baseCamera[0][2], baseCamera[1][2], baseCamera[2][2]))
-    
     # Faces composant les coins (URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB):
     coins = ((Faces.UP, Faces.RIGHT, Faces.FRONT), (Faces.UP, Faces.FRONT, Faces.LEFT), (Faces.UP, Faces.LEFT, Faces.BACK), (Faces.UP, Faces.BACK, Faces.RIGHT), (Faces.DOWN, Faces.FRONT, Faces.RIGHT), (Faces.DOWN, Faces.LEFT, Faces.FRONT), (Faces.DOWN, Faces.BACK, Faces.LEFT), (Faces.DOWN, Faces.RIGHT, Faces.BACK))
     
@@ -212,12 +194,9 @@ def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesP
     coinsFaceUP = (Coins.UFL, Coins.URF, Coins.ULB, Coins.UBR)
     coinsFaceDOWN = (Coins.DBL, Coins.DRB, Coins.DLF, Coins.DFR)
     
-    #coinsFaceBACK = (Coins.DBL, Coins.DRB, Coins.ULB, Coins.UBR)
     listeCoinsParFace = [coinsFaceFRONT, [], coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
-    #listeCoinsParFace = [coinsFaceFRONT, coinsFaceBACK, coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
 
     listeDesListesDeCoins = []
-    #listeFaces = [Faces.BACK]
     listeFaces = [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]
     
     for face in listeFaces:
@@ -334,19 +313,6 @@ def afficherRubiksCube(rubiksCube) -> None:
         
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
-    
-    #view_mat = np.matrix(np.identity(4), copy=False, dtype='float32')
-    #glPushMatrix()
-    #glLoadIdentity()
-    '''glTranslatef(tx, ty, tz)
-    glRotatef(ry, 0, 1, 0)
-    glRotatef(rx, 1, 0, 0)'''
-    
-    #glMultMatrixf(view_mat)
-    #glGetFloatv(GL_MODELVIEW_MATRIX, view_mat)
-    
-    #model_view = np.array(glGetDoublev(GL_MODELVIEW_MATRIX))
-    
     
     positionClicSouris = None
     mouvementEnCours = False
