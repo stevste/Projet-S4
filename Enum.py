@@ -58,6 +58,3 @@ class Aretes(Enum):
     LD = 9
     RU = 10
     RD = 11
-
-#NB_DE_PIXELS_DANS_UNE_UNITE = 82.64 # valeur empirique valable seulement pour cette perspective précise
-#CONSTANTE_DILATATION_DISTANCES = 0.18 # en raison de la perspective
