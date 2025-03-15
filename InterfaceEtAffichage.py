@@ -211,24 +211,38 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
 
     for indexFaceVisible in range(len(listeDesListesDeCoins)):
         listeCoinsDUneFaceVisible = listeDesListesDeCoins[indexFaceVisible]
-        for coin in listeCoinsDUneFaceVisible:
-            positionCoin = coin[0]
-            for face in coin[1]:
-                positionCoin[Faces.AXES_ROTATION.value[face.value].value] = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
-            positionCoinSurEcran = gluProject(positionCoin[0], positionCoin[1], positionCoin[2])
-            coin[0] = (int(positionCoinSurEcran[0]), int(positionCoinSurEcran[1]))
-            #print(coin[0])
+        for coinEtIntersections in listeCoinsDUneFaceVisible: # pour chacun des 4 coins de la face étudiée
+            #positionCoin = coinEtIntersexions[0] # [0,0,0]
+            for face in coinEtIntersections[1]: # pour chacune des 3 faces qui se rejoignent au coin étudié
+                coinEtIntersections[0][Faces.AXES_ROTATION.value[face.value].value] = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
+            #positionCoinSurEcran = gluProject(positionCoin[0], positionCoin[1], positionCoin[2])
+            #coinEtIntersexions[0] = (int(positionCoinSurEcran[0]), int(positionCoinSurEcran[1]))
+            #print(coinEtIntersexions[0])
            
         if len(listeCoinsDUneFaceVisible) > 0 and ((rubiksCube.caseCliquee[0] != None and indexFaceVisible == rubiksCube.caseCliquee[0].value) or rubiksCube.caseCliquee[0] == None):
-            vecteurChangementDeLigne = ((listeCoinsDUneFaceVisible[2][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[2][0][1]-listeCoinsDUneFaceVisible[0][0][1])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une ligne
-            vecteurChangementDeColonne = ((listeCoinsDUneFaceVisible[1][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[1][0][1]-listeCoinsDUneFaceVisible[0][0][1])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une colonne
+            vecteurChangementDeLigne = ((listeCoinsDUneFaceVisible[2][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[2][0][1]-listeCoinsDUneFaceVisible[0][0][1])/rubiksCube.taille, (listeCoinsDUneFaceVisible[2][0][2]-listeCoinsDUneFaceVisible[0][0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une ligne sur la face dans la base du cube
+            vecteurChangementDeColonne = ((listeCoinsDUneFaceVisible[1][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[1][0][1]-listeCoinsDUneFaceVisible[0][0][1])/rubiksCube.taille, (listeCoinsDUneFaceVisible[1][0][2]-listeCoinsDUneFaceVisible[0][0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une colonne sur la face dans la base du cube
+            
+            intersections = [[], []]
+            # Sur les segments gauche et droit :
+            for coinEtIntersections in listeCoinsDUneFaceVisible:
+                for ligne in range(rubiksCube.taille +1):
+                    pointAGauche = gluProject(listeCoinsDUneFaceVisible[0][0][0]+vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[0][0][1]+vecteurChangementDeLigne[1]*ligne, listeCoinsDUneFaceVisible[0][0][2]+vecteurChangementDeLigne[2]*ligne)
+                    pointADroite = gluProject(listeCoinsDUneFaceVisible[1][0][0]+vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[1][0][1]+vecteurChangementDeLigne[1]*ligne, listeCoinsDUneFaceVisible[1][0][2]+vecteurChangementDeLigne[2]*ligne)
+                    intersections[0].append(((int(pointAGauche[0]), int(pointAGauche[1])), (int(pointADroite[0]), int(pointADroite[1]))))
+                
+                for colonne in range(rubiksCube.taille +1):
+                    pointEnBas = gluProject(listeCoinsDUneFaceVisible[0][0][0]+vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[0][0][1]+vecteurChangementDeColonne[1]*colonne, listeCoinsDUneFaceVisible[0][0][2]+vecteurChangementDeColonne[2]*colonne)
+                    pointEnHaut = gluProject(listeCoinsDUneFaceVisible[2][0][0]+vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[2][0][1]+vecteurChangementDeColonne[1]*colonne, listeCoinsDUneFaceVisible[2][0][2]+vecteurChangementDeColonne[2]*colonne)
+                    intersections[1].append(((int(pointEnBas[0]), int(pointEnBas[1])), (int(pointEnHaut[0]), int(pointEnHaut[1]))))
+            #print(intersections)
             
             ligne = 0
-            while ligne <= rubiksCube.taille and estAuDessus(positionSouris, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[0][0][1] + vecteurChangementDeLigne[1]*ligne), (listeCoinsDUneFaceVisible[1][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[1][0][1] + vecteurChangementDeLigne[1]*ligne))):
+            while ligne <= rubiksCube.taille and estAuDessus(positionSouris, determinerEquationDroite(intersections[0][ligne][0], intersections[0][ligne][1])):
                 ligne += 1
             
             colonne = 0
-            while colonne <= rubiksCube.taille and estADroite(positionSouris, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[0][0][1] + vecteurChangementDeColonne[1]*colonne), (listeCoinsDUneFaceVisible[2][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[2][0][1] + vecteurChangementDeColonne[1]*colonne))):
+            while colonne <= rubiksCube.taille and estADroite(positionSouris, determinerEquationDroite(intersections[1][colonne][0], intersections[1][colonne][1])):
                 colonne += 1
             #print(ligne, colonne)
             
@@ -352,7 +366,6 @@ def afficherRubiksCube(rubiksCube) -> None:
         clicGaucheMaintenu = pygame.mouse.get_pressed(num_buttons=3)[0]
         if (clicGaucheMaintenu or keys[pygame.K_g]) and not rubiksCube.mouvementEnCours: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
             positionSouris = pygame.mouse.get_pos()
-            #positionCentree = [int(positionSouris[0] - dimensionsEcran[0]/2), int(-positionSouris[1] + dimensionsEcran[1]/2)]
             positionAvecYVersLeHaut = (int(positionSouris[0]), int(dimensionsEcran[1]-positionSouris[1]))
             #print(positionAvecYVersLeHaut)
 
