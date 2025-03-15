@@ -183,11 +183,7 @@ def visible(face:Faces, baseCamera:list) -> bool:
         return False
     
 
-<<<<<<< HEAD
 def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:    
-=======
-def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:
->>>>>>> eb0fd022fea6d6ca45f574ab0c0c519f2aefa560
     # Faces composant les coins (URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB):
     coins = ((Faces.UP, Faces.RIGHT, Faces.FRONT), (Faces.UP, Faces.FRONT, Faces.LEFT), (Faces.UP, Faces.LEFT, Faces.BACK), (Faces.UP, Faces.BACK, Faces.RIGHT), (Faces.DOWN, Faces.FRONT, Faces.RIGHT), (Faces.DOWN, Faces.LEFT, Faces.FRONT), (Faces.DOWN, Faces.BACK, Faces.LEFT), (Faces.DOWN, Faces.RIGHT, Faces.BACK))
     
