@@ -255,7 +255,7 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                     
                     #print(ligne, colonne, variationCase)
                     if variationCase[0] != 0: # changement de ligne
-                        if rubiksCube.caseCliquee[1][1]-variationCase[1] -1 <= rubiksCube.taille/2:
+                        if rubiksCube.caseCliquee[1][1]-variationCase[1] <= rubiksCube.taille/2:
                             if variationCase[0] == 1:
                                 sensDeRotation = Sens.ANTIHORAIRE
                             else:
@@ -274,7 +274,7 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                             rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][0].value].value]
                     
                     elif variationCase[1] != 0: # changement de colonne
-                        if rubiksCube.caseCliquee[1][0] -1 <= rubiksCube.taille/2:
+                        if rubiksCube.caseCliquee[1][0] <= rubiksCube.taille/2:
                             if variationCase[1] == 1:
                                 sensDeRotation = Sens.HORAIRE
                             else:
@@ -302,8 +302,8 @@ def afficherRubiksCube(rubiksCube) -> None:
     
     baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
 
-    gluPerspective(40, dimensionsEcran[0]/dimensionsEcran[1], 6, 14)
-    glTranslatef(0,0,-10)
+    gluPerspective(40, dimensionsEcran[0]/dimensionsEcran[1], 5, 18)
+    glTranslatef(0,0,-3 -2*rubiksCube.taille)
     
     baseCamera = tournerCube(-30, baseCamera, Axes.Y)
     baseCamera = tournerCube(60, baseCamera, Axes.X)

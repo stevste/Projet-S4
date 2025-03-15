@@ -95,7 +95,7 @@ class RubiksCube:
 
         if distanceAuBord == 1:
             couronnesATourner = [0, 1] # on doit touner les "gommettes" sur la face et celles sur la tranche de la face
-        elif 2 <= distanceAuBord <= self.taille//2 +1:
+        elif 2 <= distanceAuBord <= (self.taille+1)//2:
             couronnesATourner = [distanceAuBord] # on ne tourne que les "gommettes" sur la tranche
         else:
             couronnesATourner = []
