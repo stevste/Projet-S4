@@ -334,7 +334,7 @@ def afficherRubiksCube(rubiksCube) -> None:
                 if event.key == pygame.K_i: # info, on peut y mettre n'importe quel print d'une variable pour faire des tests
                     print(determinerPositionFacesCameraPrint(baseCamera))
         
-        keys = pygame.key.get_pressed()      
+        keys = pygame.key.get_pressed()
         positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
         if not verifierCoherence(positionFacesVuesParCamera):
             print("ATTENTION : problème de cohérence des faces vues par la caméra !")
