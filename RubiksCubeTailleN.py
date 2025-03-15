@@ -95,13 +95,13 @@ class RubiksCube:
 
         if distanceAuBord == 1:
             couronnesATourner = [0, 1] # on doit touner les "gommettes" sur la face et celles sur la tranche de la face
-        elif 2 <= distanceAuBord <= self.taille//2:
+        elif 2 <= distanceAuBord <= self.taille//2 +1:
             couronnesATourner = [distanceAuBord] # on ne tourne que les "gommettes" sur la tranche
         else:
             couronnesATourner = []
             self.mouvementEnCours = False
-            print("Les couronnes centrales ne pivotent pas.")
-            #print('Attention à bien respecter la notation : la distance au bord doit être comprise entre 1 et taille//2 inclus.')
+            #print("Les couronnes centrales ne pivotent pas.")
+            print('Attention à bien respecter la notation : la distance au bord doit être comprise entre 1 et taille//2 +1 inclus.')
         
         for couronne in couronnesATourner:
             if nomFace == Faces.FRONT:
