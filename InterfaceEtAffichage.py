@@ -115,9 +115,7 @@ def determinerPositionFacesCamera(baseCamera:list) -> list: # pour savoir quelle
     facesVuesParCamera = [None, None, None, None, None, None] # sera rempli avec la face la plus proche de la position FRONT, BACK, RIGHT, LEFT, UP, DOWN pour l'observateur
 
     for direction in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
-        #produitScalaireMaxi = round((directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[Faces.FRONT.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[Faces.FRONT.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[Faces.FRONT.value][2], 2)
         produitScalaireMaxi = 0
-        #facesVuesParCamera[direction.value] = Faces.FRONT
         for face in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
             produitScalaire = round((directionsBaseCamera[direction.value][0]*baseCamera[0][0]+directionsBaseCamera[direction.value][1]*baseCamera[1][0]+directionsBaseCamera[direction.value][2]*baseCamera[2][0])*orientationFaces[face.value][0] + (directionsBaseCamera[direction.value][0]*baseCamera[0][1]+directionsBaseCamera[direction.value][1]*baseCamera[1][1]+directionsBaseCamera[direction.value][2]*baseCamera[2][1])*orientationFaces[face.value][1] + (directionsBaseCamera[direction.value][0]*baseCamera[0][2]+directionsBaseCamera[direction.value][1]*baseCamera[1][2]+directionsBaseCamera[direction.value][2]*baseCamera[2][2])*orientationFaces[face.value][2], 2)
             if produitScalaire >= produitScalaireMaxi and (face not in facesVuesParCamera): # le deuxième test sert en cas d'égalité de deux produits scalaires, pour ne pas avoir deux fois la même face dans la liste facesVuesParCamera
@@ -178,7 +176,6 @@ def estADroite(positionSouris:tuple, equationDroite:tuple) -> bool:
 
 def visible(face:Faces, baseCamera:list) -> bool:
     orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
-    #directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
     produitScalaire = round(-baseCamera[1][0]*orientationFaces[face.value][0] - baseCamera[1][1]*orientationFaces[face.value][1] - baseCamera[1][2]*orientationFaces[face.value][2], 2)
     if produitScalaire >= 0:
         return True
@@ -221,11 +218,11 @@ def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesP
 
     listeDesListesDeCoins = []
     #listeFaces = [Faces.BACK]
-    listeFaces = [Faces.FRONT]#, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]
+    listeFaces = [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]
     
     for face in listeFaces:
         listeCoinsFace = []    
-        if True:#visible(positionFacesVuesParCamera[face.value], baseCamera):
+        if visible(positionFacesVuesParCamera[face.value], baseCamera):
             for coin in listeCoinsParFace[face.value]:
                 coordonneesEtIntersections = [[0,0,0], []] # [position, intersection de 3 faces]
                 for faceEnIntersection in coins[coin.value]:
