@@ -212,18 +212,19 @@ def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesP
     coinsFaceLEFT = (Coins.DBL, Coins.DLF, Coins.ULB, Coins.UFL)
     coinsFaceUP = (Coins.UFL, Coins.URF, Coins.ULB, Coins.UBR)
     coinsFaceDOWN = (Coins.DBL, Coins.DRB, Coins.DLF, Coins.DFR)
+
     listeCoinsParFace = [coinsFaceFRONT, [], coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
 
     #coinsFaceBACK = (Coins.DBL, Coins.DRB, Coins.ULB, Coins.UBR)
     #listeCoinsParFace = [coinsFaceFRONT, coinsFaceBACK, coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
     #listeFaces = [Faces.BACK]
-
+    
     listeDesListesDeCoins = []
     listeFaces = [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]
     
     for face in listeFaces:
         listeCoinsFace = []    
-        if visible(positionFacesVuesParCamera[face.value], baseCamera):
+        if True:#visible(positionFacesVuesParCamera[face.value], baseCamera):
             for coin in listeCoinsParFace[face.value]:
                 coordonneesEtIntersections = [[0,0,0], []] # [position, intersection de 3 faces]
                 for faceEnIntersection in coins[coin.value]:
