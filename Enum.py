@@ -36,9 +36,6 @@ class Couleur(Enum):
 SENSIBILITE_SOURIS = 0.3
 
 class Coins(Enum):
-    """Liste des coins hiérarchisée pour le solveur
-    Je me suis permis de m'en servir aussi :)
-    """
     URF = 0
     UFL = 1
     ULB = 2
