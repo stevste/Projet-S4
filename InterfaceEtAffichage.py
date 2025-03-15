@@ -183,7 +183,11 @@ def visible(face:Faces, baseCamera:list) -> bool:
         return False
     
 
+<<<<<<< HEAD
 def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:    
+=======
+def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:
+>>>>>>> eb0fd022fea6d6ca45f574ab0c0c519f2aefa560
     # Faces composant les coins (URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB):
     coins = ((Faces.UP, Faces.RIGHT, Faces.FRONT), (Faces.UP, Faces.FRONT, Faces.LEFT), (Faces.UP, Faces.LEFT, Faces.BACK), (Faces.UP, Faces.BACK, Faces.RIGHT), (Faces.DOWN, Faces.FRONT, Faces.RIGHT), (Faces.DOWN, Faces.LEFT, Faces.FRONT), (Faces.DOWN, Faces.BACK, Faces.LEFT), (Faces.DOWN, Faces.RIGHT, Faces.BACK))
     
@@ -305,19 +309,6 @@ def afficherRubiksCube(rubiksCube) -> None:
         
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
-    
-    #view_mat = np.matrix(np.identity(4), copy=False, dtype='float32')
-    #glPushMatrix()
-    #glLoadIdentity()
-    '''glTranslatef(tx, ty, tz)
-    glRotatef(ry, 0, 1, 0)
-    glRotatef(rx, 1, 0, 0)'''
-    
-    #glMultMatrixf(view_mat)
-    #glGetFloatv(GL_MODELVIEW_MATRIX, view_mat)
-    
-    #model_view = np.array(glGetDoublev(GL_MODELVIEW_MATRIX))
-    
     
     positionClicSouris = None
     mouvementEnCours = False
