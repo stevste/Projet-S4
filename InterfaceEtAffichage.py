@@ -183,25 +183,7 @@ def visible(face:Faces, baseCamera:list) -> bool:
         return False
     
 
-def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:
-    '''# get mouse position
-    x, y = pygame.mouse.get_pos()
-    
-    # get the fragment depth
-    depth = glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT)
-    
-    # get projection matrix, view matrix and the viewport rectangle
-    model_view = np.array(glGetDoublev(GL_MODELVIEW_MATRIX))
-    proj = np.array(glGetDoublev(GL_PROJECTION_MATRIX))
-    view = np.array(glGetIntegerv(GL_VIEWPORT))
-    
-    # unproject the point
-    point = gluUnProject(x, y, depth, model_view, proj, view)
-    print(round(point[0], 2), round(point[1], 2), round(point[2], 2))'''
-    
-    
-    baseCubeDansBaseCamera = ((baseCamera[0][0], baseCamera[1][0], baseCamera[2][0]), (baseCamera[0][1], baseCamera[1][1], baseCamera[2][1]), (baseCamera[0][2], baseCamera[1][2], baseCamera[2][2]))
-    
+def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:    
     # Faces composant les coins (URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB):
     coins = ((Faces.UP, Faces.RIGHT, Faces.FRONT), (Faces.UP, Faces.FRONT, Faces.LEFT), (Faces.UP, Faces.LEFT, Faces.BACK), (Faces.UP, Faces.BACK, Faces.RIGHT), (Faces.DOWN, Faces.FRONT, Faces.RIGHT), (Faces.DOWN, Faces.LEFT, Faces.FRONT), (Faces.DOWN, Faces.BACK, Faces.LEFT), (Faces.DOWN, Faces.RIGHT, Faces.BACK))
     
@@ -212,12 +194,9 @@ def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesP
     coinsFaceUP = (Coins.UFL, Coins.URF, Coins.ULB, Coins.UBR)
     coinsFaceDOWN = (Coins.DBL, Coins.DRB, Coins.DLF, Coins.DFR)
     
-    #coinsFaceBACK = (Coins.DBL, Coins.DRB, Coins.ULB, Coins.UBR)
     listeCoinsParFace = [coinsFaceFRONT, [], coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
-    #listeCoinsParFace = [coinsFaceFRONT, coinsFaceBACK, coinsFaceRIGHT, coinsFaceLEFT, coinsFaceUP, coinsFaceDOWN]
 
     listeDesListesDeCoins = []
-    #listeFaces = [Faces.BACK]
     listeFaces = [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]
     
     for face in listeFaces:
@@ -233,31 +212,23 @@ def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesP
     for indexFaceVisible in range(len(listeDesListesDeCoins)):
         listeCoinsDUneFaceVisible = listeDesListesDeCoins[indexFaceVisible]
         for coin in listeCoinsDUneFaceVisible:
-            positionCoinDansBaseCamera = coin[0]
+            positionCoin = coin[0]
             for face in coin[1]:
-                coordonnee = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
-                positionCoinDansBaseCamera[0] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][0]*coordonnee)
-                positionCoinDansBaseCamera[1] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][1]*coordonnee)
-                positionCoinDansBaseCamera[2] += int(NB_DE_PIXELS_DANS_UNE_UNITE*baseCubeDansBaseCamera[Faces.AXES_ROTATION.value[face.value].value][2]*coordonnee)
-        
-        for coin in listeCoinsDUneFaceVisible:
-            x = coin[0][0]
-            y = coin[0][1]
-            z = coin[0][2]
-            x = x - (abs(x)/x)*y*CONSTANTE_DILATATION_DISTANCES
-            z = z - (abs(z)/z)*y*CONSTANTE_DILATATION_DISTANCES
-            coin[0] = [x, y, z]
+                positionCoin[Faces.AXES_ROTATION.value[face.value].value] = Faces.SIGNES_ABSCISSES.value[face.value]*rubiksCube.taille/2
+            positionCoinSurEcran = gluProject(positionCoin[0], positionCoin[1], positionCoin[2])
+            coin[0] = (int(positionCoinSurEcran[0]), int(positionCoinSurEcran[1]))
+            #print(coin[0])
+           
+        if len(listeCoinsDUneFaceVisible) > 0 and ((rubiksCube.caseCliquee[0] != None and indexFaceVisible == rubiksCube.caseCliquee[0].value) or rubiksCube.caseCliquee[0] == None):
+            vecteurChangementDeLigne = ((listeCoinsDUneFaceVisible[2][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[2][0][1]-listeCoinsDUneFaceVisible[0][0][1])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une ligne
+            vecteurChangementDeColonne = ((listeCoinsDUneFaceVisible[1][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[1][0][1]-listeCoinsDUneFaceVisible[0][0][1])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une colonne
             
-        if len(listeCoinsDUneFaceVisible) > 0 and ((rubiksCube.caseCliquee[0] != None and indexFaceVisible == rubiksCube.caseCliquee[0].value) or rubiksCube.caseCliquee[1] == (None, None)):
-            vecteurChangementDeLigne = ((listeCoinsDUneFaceVisible[2][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[2][0][2]-listeCoinsDUneFaceVisible[0][0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une ligne
-            vecteurChangementDeColonne = ((listeCoinsDUneFaceVisible[1][0][0]-listeCoinsDUneFaceVisible[0][0][0])/rubiksCube.taille, (listeCoinsDUneFaceVisible[0][0][2]-listeCoinsDUneFaceVisible[0][0][2])/rubiksCube.taille) # déplacement nécessaire pour augmenter d'une colonne
-                        
             ligne = 0
-            while ligne <= rubiksCube.taille and estAuDessus(positionSourisCentree, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[0][0][2] + vecteurChangementDeLigne[1]*ligne), (listeCoinsDUneFaceVisible[1][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[1][0][2] + vecteurChangementDeLigne[1]*ligne))):
+            while ligne <= rubiksCube.taille and estAuDessus(positionSouris, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[0][0][1] + vecteurChangementDeLigne[1]*ligne), (listeCoinsDUneFaceVisible[1][0][0] + vecteurChangementDeLigne[0]*ligne, listeCoinsDUneFaceVisible[1][0][1] + vecteurChangementDeLigne[1]*ligne))):
                 ligne += 1
             
             colonne = 0
-            while colonne <= rubiksCube.taille and estADroite(positionSourisCentree, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[0][0][2] + vecteurChangementDeColonne[1]*colonne), (listeCoinsDUneFaceVisible[2][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[2][0][2] + vecteurChangementDeColonne[1]*colonne))):
+            while colonne <= rubiksCube.taille and estADroite(positionSouris, determinerEquationDroite((listeCoinsDUneFaceVisible[0][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[0][0][1] + vecteurChangementDeColonne[1]*colonne), (listeCoinsDUneFaceVisible[2][0][0] + vecteurChangementDeColonne[0]*colonne, listeCoinsDUneFaceVisible[2][0][1] + vecteurChangementDeColonne[1]*colonne))):
                 colonne += 1
             #print(ligne, colonne)
             
@@ -275,7 +246,7 @@ def rotationFace(positionSourisCentree:list, baseCamera:list, positionFacesVuesP
                     
                     positionRelativeFaces = [[Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN], [], [Faces.BACK, Faces.FRONT, Faces.UP, Faces.DOWN], [Faces.FRONT, Faces.BACK, Faces.UP, Faces.DOWN], [Faces.RIGHT, Faces.LEFT, Faces.BACK, Faces.FRONT], [Faces.RIGHT, Faces.LEFT, Faces.FRONT, Faces.BACK]]
                     
-                    #print(ligne, colonne, variationCase)
+                    print(ligne, colonne, variationCase)
                     if variationCase[0] != 0: # changement de ligne
                         if rubiksCube.caseCliquee[1][1]-variationCase[1] -1 <= rubiksCube.taille/2:
                             if variationCase[0] == 1:
@@ -394,8 +365,11 @@ def afficherRubiksCube(rubiksCube) -> None:
         clicGaucheMaintenu = pygame.mouse.get_pressed(num_buttons=3)[0]
         if (clicGaucheMaintenu or keys[pygame.K_g]) and not rubiksCube.mouvementEnCours: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
             positionSouris = pygame.mouse.get_pos()
-            positionCentree = [int(positionSouris[0] - dimensionsEcran[0]/2), int(-positionSouris[1] + dimensionsEcran[1]/2)]
-            rotationFace(positionCentree, baseCamera, positionFacesVuesParCamera, rubiksCube)
+            #positionCentree = [int(positionSouris[0] - dimensionsEcran[0]/2), int(-positionSouris[1] + dimensionsEcran[1]/2)]
+            positionAvecYVersLeHaut = (int(positionSouris[0]), int(dimensionsEcran[1]-positionSouris[1]))
+            #print(positionAvecYVersLeHaut)
+
+            rotationFace(positionAvecYVersLeHaut, baseCamera, positionFacesVuesParCamera, rubiksCube)
         else: # if not clicGaucheMaintenu
             rubiksCube.caseCliquee = (None, (None, None)) # [Face, (ligne, colonne)]
         
