@@ -218,7 +218,7 @@ class Grille:
             proprietesConfigEtudiee = self.determinerConfigDistanceMinimale(listeOuverte)
             listeOuverte.remove(proprietesConfigEtudiee)
             listeFermee.append(proprietesConfigEtudiee)
-            if proprietesConfigEtudiee[0] == [[' I', 'N', 'P'], ['p', '1', '3']]:
+            if proprietesConfigEtudiee[0] == [[' I', 'N', 'P'], ['p', '1', '2']]:
                 solutionTrouvee = True
 
             self.disposerPieces(proprietesConfigEtudiee[0])
