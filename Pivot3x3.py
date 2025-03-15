@@ -17,6 +17,8 @@ COULEUR_ROULETTES = (170,140,120)
 SENS_HORAIRE = -1
 SENS_ANTIHORAIRE = 1
 
+IMAGE = pygame.transform.scale(pygame.image.load("imageMulticolore.jpg"), (3*COTE_CASES, 3*COTE_CASES))
+
 
 
 class Bouton:
@@ -44,18 +46,21 @@ class Bouton:
 
 
 class Piece:
-    def __init__(self, position:tuple, couleur:tuple, valeur:int):
+    def __init__(self, position:tuple, couleur:tuple, valeur:int, portionImage:tuple):
         self.position = position # [x,y] en pixels
         self.positionArrivee = position
         self.couleur = couleur
         self.valeur = valeur
         self.texte = str(self.valeur)
+        self.portionImage = portionImage
     
     def dessiner(self, screen) -> None:
-        pygame.draw.rect(screen, self.couleur, pygame.Rect(self.position[0], self.position[1], COTE_CASES, COTE_CASES), 0, int(0.3*COTE_CASES))
+        screen.blit(IMAGE, self.position, (self.portionImage[0], self.portionImage[1], COTE_CASES, COTE_CASES))
+        pygame.draw.rect(screen, COULEUR_BORD_PIECES, pygame.Rect(self.position[0], self.position[1], COTE_CASES, COTE_CASES), 2)
+        '''pygame.draw.rect(screen, self.couleur, pygame.Rect(self.position[0], self.position[1], COTE_CASES, COTE_CASES), 0, int(0.3*COTE_CASES))
         pygame.draw.rect(screen, COULEUR_BORD_PIECES, pygame.Rect(self.position[0], self.position[1], COTE_CASES, COTE_CASES), 3, int(0.3*COTE_CASES))
         texte = pygame.font.Font(None, int(COTE_CASES)).render(self.texte, 1, COULEUR_BORDURE_GRILLE)
-        screen.blit(texte, (self.position[0] + 42, self.position[1] + 30))
+        screen.blit(texte, (self.position[0] + 42, self.position[1] + 30))'''
     
     def deplacer(self) -> bool: # True si le déplacement est terminé
         if self.position != self.positionArrivee:
@@ -108,7 +113,7 @@ class Grille:
         for ligne in range(len(configPivot)):
             self.pieces.append([])
             for colonne in range(len(configPivot[0])):
-                self.pieces[ligne].append(Piece([ORIGINE_GRILLE[0] + colonne*COTE_CASES,ORIGINE_GRILLE[1] + ligne*COTE_CASES], COULEUR_PIECES, configPivot[ligne][colonne]))
+                self.pieces[ligne].append(Piece([ORIGINE_GRILLE[0] + colonne*COTE_CASES,ORIGINE_GRILLE[1] + ligne*COTE_CASES], COULEUR_PIECES, configPivot[ligne][colonne], (colonne*COTE_CASES, ligne*COTE_CASES)))
                 
         self.mouvementEnCours = False
         self.rouletteSelectionnee = None
