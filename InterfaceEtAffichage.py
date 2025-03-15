@@ -247,9 +247,9 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                     variationCase = (ligne-rubiksCube.caseCliquee[1][0], colonne-rubiksCube.caseCliquee[1][1])
                     rubiksCube.caseCliquee = [listeFaces[indexFaceVisible], (ligne, colonne)]
                     if variationCase[0] != 0 and variationCase[0] != 1: # on rend la variation de ligne unitaire
-                        variationCase = (abs(variationCase[0])/variationCase[0], variationCase[1])
+                        variationCase = (int(abs(variationCase[0])/variationCase[0]), variationCase[1])
                     if variationCase[1] != 0 and variationCase[1] != 1: # on rend la variation de colonne unitaire
-                        variationCase = (variationCase[0], abs(variationCase[1])/variationCase[1])
+                        variationCase = (variationCase[0], int(abs(variationCase[1])/variationCase[1]))
                     
                     positionRelativeFaces = [[Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN], [], [Faces.BACK, Faces.FRONT, Faces.UP, Faces.DOWN], [Faces.FRONT, Faces.BACK, Faces.UP, Faces.DOWN], [Faces.RIGHT, Faces.LEFT, Faces.BACK, Faces.FRONT], [Faces.RIGHT, Faces.LEFT, Faces.FRONT, Faces.BACK]]
                     
