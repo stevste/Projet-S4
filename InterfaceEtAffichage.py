@@ -314,6 +314,7 @@ def afficherRubiksCube(rubiksCube) -> None:
     glDepthFunc(GL_LESS)
     
     positionClicSouris = None
+    clicGaucheRotationCube = False
     mouvementEnCours = False
     
     running = True
@@ -323,6 +324,9 @@ def afficherRubiksCube(rubiksCube) -> None:
                 running = False
                 pygame.quit()
                 sys.exit()
+            
+            if event.type == pygame.MOUSEBUTTONUP:
+                clicGaucheRotationCube = False
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE: # Réinitialisation de la vue
@@ -334,36 +338,37 @@ def afficherRubiksCube(rubiksCube) -> None:
                 if event.key == pygame.K_i: # info, on peut y mettre n'importe quel print d'une variable pour faire des tests
                     print(determinerPositionFacesCameraPrint(baseCamera))
         
+        positionSouris = pygame.mouse.get_pos()
         keys = pygame.key.get_pressed()
+        clicGaucheMaintenu = pygame.mouse.get_pressed(num_buttons=3)[0]
+        clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
+        
         positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
         if not verifierCoherence(positionFacesVuesParCamera):
             print("ATTENTION : problème de cohérence des faces vues par la caméra !")
         
-        clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
-        if clicDroitMaintenu or keys[pygame.K_h]: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
-            positionActuelle = pygame.mouse.get_pos()
+        if (clicGaucheMaintenu or keys[pygame.K_g]) and not clicGaucheRotationCube and not rubiksCube.mouvementEnCours: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
+            positionAvecYVersLeHaut = (int(positionSouris[0]), int(dimensionsEcran[1]-positionSouris[1]))
+            rotationFace(positionAvecYVersLeHaut, baseCamera, positionFacesVuesParCamera, rubiksCube)
+            if rubiksCube.caseCliquee[0] is None:
+                clicGaucheRotationCube = True # on fait tourner le cube au lieu de tourner une face
+        else: # if not clicGaucheMaintenu
+            rubiksCube.caseCliquee = (None, (None, None)) # [Face, (ligne, colonne)]
+        
+        if clicDroitMaintenu or clicGaucheRotationCube or keys[pygame.K_h]: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
             if positionClicSouris is None:
-                positionClicSouris = positionActuelle
+                positionClicSouris = positionSouris
             else:
-                deplacementHorizontal = int((positionActuelle[0] - positionClicSouris[0])*SENSIBILITE_SOURIS)
+                deplacementHorizontal = int((positionSouris[0] - positionClicSouris[0])*SENSIBILITE_SOURIS)
                 baseCamera = tournerCube(-deplacementHorizontal, baseCamera, Axes.Z)
                 historiqueRotations.append((-deplacementHorizontal, baseCamera, Axes.Z))
                 
-                deplacementVertical = int((positionActuelle[1] - positionClicSouris[1])*SENSIBILITE_SOURIS)
+                deplacementVertical = int((positionSouris[1] - positionClicSouris[1])*SENSIBILITE_SOURIS)
                 baseCamera = tournerCube(-deplacementVertical, baseCamera, Axes.X)
                 historiqueRotations.append((-deplacementVertical, baseCamera, Axes.X))
-                positionClicSouris = positionActuelle
+                positionClicSouris = positionSouris
         else:
             positionClicSouris = None
-        
-        clicGaucheMaintenu = pygame.mouse.get_pressed(num_buttons=3)[0]
-        if (clicGaucheMaintenu or keys[pygame.K_g]) and not rubiksCube.mouvementEnCours: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
-            positionSouris = pygame.mouse.get_pos()
-            positionAvecYVersLeHaut = (int(positionSouris[0]), int(dimensionsEcran[1]-positionSouris[1]))
-
-            rotationFace(positionAvecYVersLeHaut, baseCamera, positionFacesVuesParCamera, rubiksCube)
-        else: # if not clicGaucheMaintenu
-            rubiksCube.caseCliquee = (None, (None, None)) # [Face, (ligne, colonne)]
         
         if not rubiksCube.mouvementEnCours:
             if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
