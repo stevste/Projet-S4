@@ -1,5 +1,5 @@
 import RubiksCubeTailleN
 import InterfaceEtAffichage
 
-rubiksCube = RubiksCubeTailleN.RubiksCube(4)
+rubiksCube = RubiksCubeTailleN.RubiksCube(3)
 InterfaceEtAffichage.afficherRubiksCube(rubiksCube)
