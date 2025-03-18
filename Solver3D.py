@@ -165,28 +165,39 @@ def ComparePiece(p1, p2):
 
 def GetCornerPermCoord(pieceList, ref):
     coord = 0
-    for i in range(len(pieceList)-1, 0, -1):
-        k = 0
+    perm = []
+
+    for i in pieceList:
         j=0
-        while not ComparePiece(pieceList[i], ref[j]):
-            pass
+        while not ComparePiece(i, ref[j]):
+            j += 1
+        perm.append(j)
+    
+    for i in range(1, len(perm)):
+        k = 0
+        for j in range(0, i):
+            if perm[j] >= perm[i]:
+                k += 1
         coord += k*math.factorial(i)
 
     return coord
 
 def GetEdgePermCoord(pieceList, ref):
     coord = 0
-    perm = list(pieceList)
-    for i in range(7, 0, -1):
-        k = 0
-        isUD = True
-        for j in range(8, 12):
-            if ComparePiece(perm[i], ref[j]):
-                isUD = False
+    perm = []
 
-        while not ComparePiece(perm[i], ref[i]) and isUD:
-            moveUp(perm, 0, i)
-            k += 1
+    for i in pieceList:
+        j=0
+        while not ComparePiece(i, ref[j]) and j <=7 :
+            j += 1
+        if j<=7:
+            perm.append(j)
+    
+    for i in range(1, len(perm)):
+        k = 0
+        for j in range(0, i):
+            if perm[j] >= perm[i]:
+                k += 1
         coord += k*math.factorial(i)
 
     return coord
