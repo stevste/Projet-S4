@@ -3,6 +3,53 @@ import random
 import math
 from Enum import *
 
+cubeRef = RubiksCube()
+
+class SymClass:
+    def __init__(self, cube: RubiksCube, ref = cubeRef):
+        self.mainConfig = CopyConfig(cube.configuration)
+        self.classMembers = [cube.coinsEtAretes()]
+
+        for i in range(0, 3):
+            self.classMembers.append(self.rotate(i))
+
+        self.minCoord = GetP2Coord(self.classMembers[0], cubeRef.coinsEtAretes())
+
+        for i in range(1, 4):
+            coord = GetP2Coord(self.classMembers[i], cubeRef.coinsEtAretes())
+
+            if coord < self.minCoord:
+                self.minCoord = coord
+
+    def rotate(self, startIndex = 0):
+        newConfig = []
+
+        for c in range(2):
+            newConfig.append([])
+            for i in range(len(self.classMembers[startIndex][c])):
+                newConfig[c].append([])
+                for j in self.classMembers[startIndex][c][i]:
+                    match j:
+                        case Faces.FRONT:
+                            newConfig[c][i].append(Faces.RIGHT)
+                        case Faces.RIGHT:
+                            newConfig[c][i].append(Faces.BACK)
+                        case Faces.BACK:
+                            newConfig[c][i].append(Faces.LEFT)
+                        case Faces.LEFT:
+                            newConfig[c][i].append(Faces.FRONT)
+                        case _:
+                            newConfig[c][i].append(j)
+
+        return newConfig
+
+    def isInClass(self, pieceList):
+        for i in self.classMembers:
+            if ComparePiece(pieceList, i):
+                return True
+        
+        return False
+
 def jouerFormule(formule: list, cube: RubiksCube):
     for m in formule:
         match m:
@@ -132,7 +179,7 @@ def ApplyMove(m: Moves, cube: RubiksCube):
         case Moves.B3.value:
             cube.pivoterFace(Faces.BACK, Sens.ANTIHORAIRE)
 
-def ApplyConfig(dest: RubiksCube, src: list):
+def CopyConfig(src: list):
     cpy = []
     for i in range(0, len(src)):
         cpy.append([])
@@ -140,7 +187,7 @@ def ApplyConfig(dest: RubiksCube, src: list):
             cpy[i].append([])
             for k in range(0, len(src[i][j])):
                 cpy[i][j].append(src[i][j][k])
-    dest.configuration = cpy
+    return cpy
 
 def CompareConfig(config1, config2):
     for i in range(0, len(config1)):
@@ -233,43 +280,38 @@ def GetUDSliceCoord(edgeList, refEdge):
 
     return coord
 
-def PhaseTwo(cube: RubiksCube, refCorner, refEdges):
-    def GetLenght(coordP2):
-        return coordP2[0] + coordP2[1] + coordP2[2]
-    
-    actualCorner, actualEdge = cube.coinsEtAretes()
+def GetP2Coord(pieceList, refList):
+    return GetCornerPermCoord(pieceList[0], refList[0]) + GetEdgePermCoord(pieceList[1], refList[1]) + GetUDSliceCoord(pieceList[1], refList[1])
+
+def PhaseTwo(cube: RubiksCube, ref = cubeRef):
     solve = False
-    coordP2 = (GetCornerPermCoord(actualCorner, refCorner), GetEdgePermCoord(actualEdge, refEdges), GetUDSliceCoord(actualEdge, refEdges))
-    open = [(cube.configuration, None, coordP2, None)]
+    open = [(SymClass(cube, ref), -1, None)]
     close = []
     minimalIndex = 0
     while not solve and len(open) > 0:
         distList = []
         for i in open:
-            distList.append(GetLenght(i[2]))
+            distList.append(i[0].minCoord)
         
-        minimal = min(distList)
         minimalIndex = distList.index(min(distList))
-        if minimal == 0:
+        if min(distList) == 0:
             solve = True
             close.append(open[minimalIndex])
         else:
-            minConfig = open[minimalIndex][0]
-            ApplyConfig(cube, minConfig)
+            minConfig = open[minimalIndex][0].mainConfig
+            cube.configuration = CopyConfig(minConfig)
 
             for m in Moves.MOVELIST.value:
                 if m not in [Moves.R1.value, Moves.R3.value, Moves.L1.value, Moves.L3.value, Moves.F1.value, Moves.F3.value, Moves.B1.value, Moves.B3.value]:
                     ApplyMove(m, cube)
                     inClose = False
                     for c in (close + open):
-                        if CompareConfig(cube.configuration, c[0]):
+                        if c[0].isInClass(cube.coinsEtAretes()):
                             inClose = True
                     
                     if not inClose:
-                        newCorners, newEdges = cube.coinsEtAretes()
-                        coordP2 = (GetCornerPermCoord(newCorners, refCorner), GetEdgePermCoord(newEdges, refEdges), GetUDSliceCoord(newEdges, refEdges))
-                        open.append((cube.configuration, minConfig, coordP2, m))
-                    ApplyConfig(cube, minConfig)
+                        open.append((SymClass(cube, ref), len(close), m))
+                    cube.configuration = CopyConfig(minConfig)
             
             close.append(open[minimalIndex])
             open.pop(minimalIndex)
@@ -284,11 +326,9 @@ def GetResultAstar(tree: list):
     result = []
     currentIndex = len(tree)-1
 
-    while tree[currentIndex][1] != None:
-        for i in tree:
-            if i[0] == tree[currentIndex][1]:
-                result.append(tree[currentIndex][3])
-                currentIndex = tree.index(i)
+    while tree[currentIndex][1] != -1:
+        result.append(tree[currentIndex][2])
+        currentIndex = tree[currentIndex][1]
     return list(reversed(result))
 
 def PhaseOne():
@@ -296,7 +336,6 @@ def PhaseOne():
 
 def Solve(cube: RubiksCube):
     clone = RubiksCube()
-    refCorner, refEdges = clone.coinsEtAretes()
-    ApplyConfig(clone, cube.configuration)
-    sequence = PhaseTwo(clone, refCorner, refEdges)
+    clone.configuration = CopyConfig(cube.configuration)
+    sequence = PhaseTwo(clone)
     jouerFormule(sequence, cube)
