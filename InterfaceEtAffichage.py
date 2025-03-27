@@ -332,13 +332,13 @@ def afficherRubiksCube(rubiksCube) -> None:
             if keys[pygame.K_s]:
                 scramble = generateScrambleSubGroup()
                 jouerFormule(scramble, rubiksCube)
-            if keys[pygame.K_t]:
+            if keys[pygame.K_s]:
                 c, e = rubiksCube.coinsEtAretes()
                 #print(GetEdgePermCoord(e, refE))
                 Solve(rubiksCube)
-            if keys[pygame.K_c]:
-                c, e = rubiksCube.coinsEtAretes()
-                print(GetCornerPermCoord(c, refC))
+            if keys[pygame.K_t]:
+                test = CubieCube(rubiksCube)
+                print("yes")
 
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)

@@ -5,6 +5,74 @@ from Enum import *
 
 cubeRef = RubiksCube()
 
+class CubieCube:
+    def __init__(self, FaceletCube = None, cp = None, co = None, ep = None, eo = None):
+        self.cornerPerm = []
+        self.cornerOri = []
+        self.edgePerm = []
+        self.edgeOri = []
+
+        if FaceletCube != None:
+            cFacelet, eFacelet = FaceletCube.coinsEtAretes()
+            cRef, eRef = cubeRef.coinsEtAretes()
+
+            for i in cFacelet:
+                for j in range(len(cRef)):
+                    if ComparePiece(i, cRef[j]):
+                        self.cornerPerm.append(Coins(j))
+                        b = 0
+                        for c in i:
+                            if c != cRef[j][0]:
+                                b += 1
+                            else:
+                                break
+                        self.cornerOri.append(b)
+            
+            for i in eFacelet:
+                for j in range(len(eRef)):
+                    if ComparePiece(i, eRef[j]):
+                        self.edgePerm.append(Aretes(j))
+                        b = 0
+                        for c in i:
+                            if c != eRef[j][0]:
+                                b += 1
+                            else:
+                                break
+                        self.edgeOri.append(b)
+        else:
+            if cp == None:
+                self.cornerPerm = [Coins(i) for i in range(8)]
+            else:
+                self.cornerPerm = cp[:]
+            if co == None:
+                self.cornerOri = [0]*8
+            else:
+                self.cornerOri = co[:]
+            if ep == None:
+                self.edgePerm = [Aretes(i) for i in range(12)]
+            else:
+                self.edgePerm = co[:]
+            if eo == None:
+                self.edgeOri = [0]*12
+            else:
+                self.edgeOri = eo[:]
+
+    def __str__(self):
+        """Print string for a cubie cube."""
+        s = ''
+        for i in Coins:
+            s = s + '(' + str(self.cornerPerm[i].value()) + ',' + str(self.cornerOri[i]) + ')'
+        s += '\n'
+        for i in Aretes:
+            s = s + '(' + str(self.edgePerm[i].value()) + ',' + str(self.edgeOri[i]) + ')'
+        return s
+    
+    def __eq__(self, other):
+        """Define equality of two cubie cubes."""
+        if self.cornerPerm == other.cornerPerm and self.cornerOri == other.cornerOri and self.edgePerm == other.edgePerm and self.edgeOri == other.edgeOri:
+            return True
+        return False
+
 class SymClass:
     def __init__(self, cube: RubiksCube, ref = cubeRef):
         self.mainConfig = CopyConfig(cube.configuration)
