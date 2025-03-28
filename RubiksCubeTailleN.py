@@ -139,14 +139,14 @@ class RubiksCube:
                 (c[1][self.taille][0], c[1][self.taille+1][1], c[0][self.taille][1]), # DBL
                 (c[self.taille][self.taille][0], c[self.taille+1][self.taille][1], c[self.taille][self.taille+1][1])] # DRB
             
-        aretes = [(c[2][0][self.taille], c[2][1][self.taille+1]), #FU
-                    (c[2][0][1], c[2][1][0]), # FD
-                    (c[2][self.taille+1][self.taille], c[2][self.taille][self.taille+1]), # BU
-                    (c[2][self.taille+1][1], c[2][self.taille][0]), # BD
+        aretes = [(c[self.taille+1][2][self.taille], c[self.taille][2][self.taille+1]), # RU
+                    (c[2][0][self.taille], c[2][1][self.taille+1]), #FU
                     (c[0][2][self.taille], c[1][2][self.taille+1]), # LU
-                    (c[0][2][1], c[1][2][0]), # LD
-                    (c[self.taille+1][2][self.taille], c[self.taille][2][self.taille+1]), # RU
+                    (c[2][self.taille+1][self.taille], c[2][self.taille][self.taille+1]), # BU
                     (c[self.taille+1][2][1], c[self.taille][2][0]), # RD
+                    (c[2][0][1], c[2][1][0]), # FD
+                    (c[0][2][1], c[1][2][0]), # LD
+                    (c[2][self.taille+1][1], c[2][self.taille][0]), # BD
                     (c[self.taille][0][2], c[self.taille+1][1][2]), # FR
                     (c[1][0][2], c[0][1][2]), # FL
                     (c[1][self.taille+1][2], c[0][self.taille][2]), # BL

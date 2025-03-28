@@ -9,6 +9,7 @@ from OpenGL.GLU import *
 from Enum import *
 
 from Solver3D import *
+import CubieCube as cc
 import RubiksCubeTailleN
 
 
@@ -337,7 +338,8 @@ def afficherRubiksCube(rubiksCube) -> None:
                 #print(GetEdgePermCoord(e, refE))
                 Solve(rubiksCube)
             if keys[pygame.K_t]:
-                test = CubieCube(rubiksCube)
+                test = cc.CubieCube(rubiksCube)
+                test.Move(Moves.F1)
                 print("yes")
 
         if keys[pygame.K_UP]:
