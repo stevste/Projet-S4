@@ -339,7 +339,7 @@ def afficherRubiksCube(rubiksCube) -> None:
                 Solve(rubiksCube)
             if keys[pygame.K_t]:
                 test = cc.CubieCube(rubiksCube)
-                test.Move(Moves.F1)
+                #test.Move(Moves.F1)
                 print("yes")
 
         if keys[pygame.K_UP]:

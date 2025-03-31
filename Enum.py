@@ -49,14 +49,14 @@ class Coins(Enum):
     DRB = 7
 
 class Aretes(Enum):
-    RU = 0
-    FU = 1
-    LU = 2
-    BU = 3
-    RD = 4
-    FD = 5
-    LD = 6
-    BD = 7
+    UR = 0
+    UF = 1
+    UL = 2
+    UB = 3
+    DR = 4
+    DF = 5
+    DL = 6
+    DB = 7
     FR = 8
     FL = 9
     BL = 10
