@@ -1,4 +1,6 @@
 from enum import Enum
+import pygame
+
 
 STRUCTURE = 6
 
@@ -58,3 +60,34 @@ class Aretes(Enum):
     LD = 9
     RU = 10
     RD = 11
+
+# Pour l'enchaînement des fenêtres :
+QUITTER = -1
+MENU = 0
+CARRES = 1
+CUBES = 2
+PIVOTS = 3
+SOLVEUR = 4
+
+CUBE_2 = 5
+CUBE_3 = 6
+CUBE_4 = 7
+CUBE_5 = 8
+CUBE_6 = 9
+CUBE_7 = 10
+
+CARRE_3 = 11
+CARRE_4 = 12
+CARRE_5 = 13
+
+PIVOT_2X3 = 14
+PIVOT_3X3 = 15
+PIVOT_3X4 = 16
+
+COULEUR_FOND = (150, 175, 215)#(175, 175, 215)
+COULEUR_BOUTONS = (175, 215, 230)
+ROUGE = (200, 130, 130)
+VERT = (150, 215, 150)
+
+IMAGE_MULTICOLORE = pygame.image.load("imageMulticolore.jpg")
+IMAGE_COLOREE = pygame.image.load("imageColoree.jpg")
