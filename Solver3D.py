@@ -2,6 +2,8 @@ from RubiksCubeTailleN import RubiksCube
 import random
 import math
 from Enum import *
+import CubieCube as cb
+import PrunningTable as prT
 
 cubeRef = RubiksCube()
 class SymClass:
@@ -282,22 +284,22 @@ def GetUDSliceCoord(edgeList, refEdge):
 def GetP2Coord(pieceList, refList):
     return GetCornerPermCoord(pieceList[0], refList[0]) + GetEdgePermCoord(pieceList[1], refList[1]) + GetUDSliceCoord(pieceList[1], refList[1])
 
-def PhaseTwo(cube: RubiksCube, ref = cubeRef):
+def PhaseTwo(cube: cb.CubieCube, ref = cubeRef):
     solve = False
-    open = [(SymClass(cube, ref), -1, None)]
+    open = [(cube, -1, None)]
     close = []
     minimalIndex = 0
     while not solve and len(open) > 0:
         distList = []
         for i in open:
-            distList.append(i[0].minCoord)
+            distList.append(i[1])
         
         minimalIndex = distList.index(min(distList))
         if min(distList) == 0:
             solve = True
             close.append(open[minimalIndex])
         else:
-            minConfig = open[minimalIndex][0].mainConfig
+            minConfig = open[minimalIndex]
             cube.configuration = CopyConfig(minConfig)
 
             for m in Moves.MOVELIST.value:

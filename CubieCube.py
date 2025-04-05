@@ -174,6 +174,20 @@ class CubieCube:
             c = (j+1)*c+k
         return c
 
+    def GetUDSlicePerm(self):
+        perm = list(self.cornerPerm)
+        c = 0
+        for i in range(11, 8, -1):
+            k=0
+            while perm[i].value != i:
+                temp = perm[0]
+                for j in range(0, j):
+                    perm[j] = j[+1]
+                perm[j] = temp
+                k += 1
+            c = (j+1)*c+k
+        return c
+
     def SetCorner(self, cpCoord):
         self.cornerPerm = [i for i in Coins]
         for j in range(8):
@@ -187,22 +201,17 @@ class CubieCube:
                 k -= 1
     
     def SetUDEdges(self, epCoord):
-        ref = list(Aretes)[0:8]
-        for j in range(8):
-            k = epCoord % (j + 1)
-            epCoord //= j + 1
+        for i in list(Aretes)[0:8]:
+            self.edgePerm[i.value] = i
+        for j in list(Aretes)[0:8]:
+            k = epCoord % (j.value + 1)
+            epCoord //= j.value + 1
             while k > 0:
                 temp = self.edgePerm[j]
-                for i in range(j, 0, -1):
-                    ref[j] = self.edgePerm[j-1]
+                for i in range(j.value, 0, -1):
+                    self.edgePerm[j] = self.edgePerm[j-1]
                 self.edgePerm[0] = temp
                 k -= 1
-
-        i = 0
-        for j in range(12):
-            if self.edgePerm[j] in ref:
-                self.edgePerm[j] = ref[i]
-                i += 1
     
 standardMove = [0]*6
 standardMove[0] = CubieCube(None, cpU, coU, epU, eoU)

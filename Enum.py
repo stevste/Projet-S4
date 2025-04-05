@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 STRUCTURE = 6
 
@@ -62,26 +62,25 @@ class Aretes(Enum):
     BL = 10
     BR = 11
 
-class Moves(Enum):
+class Moves(IntEnum):
     U1 = 0
     U2 = 1
     U3 = 2
-    D1 = 3
-    D2 = 4
-    D3 = 5
-    R1 = 6
-    R2 = 7
-    R3 = 8
-    L1 = 9
-    L2 = 10
-    L3 = 11
-    F1 = 12
-    F2 = 13
-    F3 = 14
+    R1 = 3
+    R2 = 4
+    R3 = 5
+    F1 = 6
+    F2 = 7
+    F3 = 8
+    D1 = 9
+    D2 = 10
+    D3 = 11
+    L1 = 12
+    L2 = 13
+    L3 = 14
     B1 = 15
     B2 = 16
     B3 = 17
-    MOVELIST = [U1, U2, U3, D1, D2, D3, R1, R2, R3, L1, L2, L3, F1, F2, F3, B1, B2, B3]
     
 class CoordMod(Enum):
     EDGE = 2
