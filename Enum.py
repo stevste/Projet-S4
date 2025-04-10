@@ -35,7 +35,7 @@ class Couleur(Enum):
 
 SENSIBILITE_SOURIS = 0.3
 
-class Coins(Enum):
+class Coins(IntEnum):
     """Liste des coins hiérarchisée pour le solveur
 
     """
@@ -48,7 +48,7 @@ class Coins(Enum):
     DBL = 6
     DRB = 7
 
-class Aretes(Enum):
+class Aretes(IntEnum):
     UR = 0
     UF = 1
     UL = 2
@@ -82,7 +82,4 @@ class Moves(IntEnum):
     B2 = 16
     B3 = 17
     
-class CoordMod(Enum):
-    EDGE = 2
-    CORNER = 3
 NB_DE_PIXELS_DANS_UNE_UNITE = 82.64 # valeur empirique valable seulement pour cette perspective précise

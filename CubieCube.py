@@ -2,6 +2,7 @@ from Enum import *
 from movesAndSymetrie import *
 from RubiksCubeTailleN import RubiksCube
 from Solver3D import ComparePiece
+import math
 
 N_PERM_COORD = 40320
 N_CORNERS_CLASS = 2768
@@ -136,6 +137,22 @@ class CubieCube:
                 inv.cornerOri[i] = -ori
                 if inv.cornerOri[i] < 0:
                     inv.cornerOri[i] += 3
+        
+        return inv
+
+    def GetSymetrie(self):
+        s = []
+        for i in range(48):
+            c = CubieCube()
+            c.Composition(standardSym[j])
+            c.Composition(self)
+            c.Composition(standardSym[invId[j]])
+
+            if self == c:
+                s.append(j)
+            if self == c.InvCube():
+                s.append(j+48)
+            return s
 
     def Move(self, m: Moves):
         self.Composition(moveTable[m.value])
@@ -146,47 +163,97 @@ class CubieCube:
         for i in range(7, 0, -1):
             k=0
             while perm[i].value != i:
-                temp = perm[0]
-                for j in range(0, j):
-                    perm[j] = j[+1]
-                perm[j] = temp
-                k += 1
+                MoveUp(perm, 0, i)
             c = (j+1)*c+k
         return c
 
-    def getCornerOriCoord(self):
+    def GetCornerOriCoord(self):
         c = 0
         for i in range(8):
             c = 3*c + self.cornerOri[i]
         return c
     
-    def GetUDEdgeCoord(self):
+    def GetUDEdgePerm(self):
         perm = list(self.cornerPerm)
         c = 0
         for i in range(7, 0, -1):
             k=0
             while perm[i].value != i:
-                temp = perm[0]
-                for j in range(0, j):
-                    perm[j] = j[+1]
-                perm[j] = temp
+                MoveUp(perm, 0, i)
                 k += 1
             c = (j+1)*c+k
         return c
 
-    def GetUDSlicePerm(self):
-        perm = list(self.cornerPerm)
-        c = 0
-        for i in range(11, 8, -1):
-            k=0
-            while perm[i].value != i:
-                temp = perm[0]
-                for j in range(0, j):
-                    perm[j] = j[+1]
-                perm[j] = temp
+    def GetUDSliceCoord(self):
+        location = 0
+        k = 0
+        sliceEdgePos = [0]*4
+
+        for i in range(11, 0, -1):
+            if 8 <= self.edgePerm[j] <= 11:
+                location += math.comb(11-j, k+1)
+                sliceEdgePos[3-k] = self.edgePerm[j]
                 k += 1
-            c = (j+1)*c+k
-        return c
+        
+        permutation = 0
+        for i in range(3, 0, -1):
+            k = 0
+            while sliceEdgePos[i].value != i:
+                MoveUp(sliceEdgePos, 0, i)
+                k += 1
+            permutation = (j+1)*permutation+k
+        
+        return 24*sliceEdgePos + permutation
+
+    def GetUEdgeCoord(self):
+        location = 0
+        k = 0
+        UEdgePos = [0]*4
+        perm = self.edgePerm[:]
+
+        for i in range(4):
+            MoveDown(perm, 0, 11)
+
+        for i in range(11, 0, -1):
+            if 0 <= perm[j] <= 3:
+                location += math.comb(11-j, k+1)
+                UEdgePos[3-k] = perm[j]
+                k += 1
+        
+        permutation = 0
+        for i in range(3, 0, -1):
+            k = 0
+            while UEdgePos[i].value != i:
+                temp = UEdgePos[0]
+                MoveUp(UEdgePos, 0, i)
+            permutation = (j+1)*permutation+k
+        
+        return 24*location + permutation
+
+    def GetDEdgeCoord(self):
+        location = 0
+        k = 0
+        UEdgePos = [0]*4
+        perm = self.edgePerm[:]
+
+        for i in range(4):
+            MoveDown(perm, 0, 11)
+
+        for i in range(11, 0, -1):
+            if 4 <= perm[j] <= 7:
+                location += math.comb(11-j, k+1)
+                UEdgePos[3-k] = perm[j]
+                k += 1
+    
+        permutation = 0
+        for i in range(3, 0, -1):
+            k = 0
+            while UEdgePos[i].value != i:
+                temp = UEdgePos[0]
+                MoveUp(UEdgePos, 0, i)
+            permutation = (j+1)*permutation+k
+        
+        return 24*location + permutation
 
     def SetCorner(self, cpCoord):
         self.cornerPerm = [i for i in Coins]
@@ -257,42 +324,14 @@ for j in range(48):
             invId[j] = i
             break
 
-cornerClassId = [65535]*N_PERM_COORD  # idx -> classidx
-cornerSymTable = [0] * N_PERM_COORD  # idx -> symmetry
-cornerRep = [0] * N_CORNERS_CLASS  # classidx -> idx of representant
+def MoveDown(liste: list, top, bot):
+    temp = liste[bot]
+    for i in range(bot, top, -1):
+        liste[i] = liste[i-1]
+    liste[top] = temp
 
-classidx = 0
-cc = CubieCube()
-for cp in range(N_PERM_COORD):
-    cc.SetCorner(cp)
-    if (cp + 1) % 8000 == 0:
-        print('.', end='', flush=True)
-
-    if cornerClassId[cp] == 65535:
-        cornerClassId[cp] = classidx
-        cornerSymTable[cp] = 0
-        cornerRep[classidx] = cp
-    else:
-        continue
-    for s in range(16):  # conjugate representant by all 16 symmetries
-        ss = CubieCube(None, sTable[invId[s]].cornerPerm, sTable[invId[s]].cornerOri, sTable[invId[s]].edgePerm,
-                            sTable[invId[s]].edgeOri)  # copy cube
-        ss.cornerComposition(cc)
-        ss.cornerComposition(sTable[s])  # s^-1*cc*s
-        cpNew = ss.get_corners()
-        if cornerClassId[cpNew] == 65535:
-            cornerClassId[cpNew] = classidx
-            cornerSymTable[cpNew] = s
-    classidx += 1
-
-classidx = 0
-
-UDEdgeConj = [0] * (N_PERM_COORD * 16) #phase 2 edgeCoordsym
-for t in range(16):
-    cc = CubieCube()
-    cc.SetUDEdges(t)
-    for s in range(16):
-        ss = CubieCube(None, sTable[s].cornerPerm, sTable[s].cornerOri, sTable[s].edgePerm, sTable[s].edgeOri)  # copy cube
-        ss.edge_multiply(cc)  # s*t
-        ss.edge_multiply(sTable[invId[s]])  # s*t*s^-1
-        UDEdgeConj[16 * t + s] = ss.get_ud_edges()
+def MoveUp(liste: list, top, bot):
+    temp = liste[top]
+    for i in range(top, bot):
+        liste[i] = liste[i+1]
+    liste[bot] = temp

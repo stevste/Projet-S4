@@ -182,3 +182,17 @@ print("loading " + fname + " table...")
 fh = open(path.join(FOLDER, fname), "rb")
 cornslice_depth = ar.array('b')
 cornslice_depth.fromfile(fh, N_CORNERS * N_PERM_4)
+
+print("loading " + fname + " table...")
+fh = open(path.join(FOLDER, fname), "rb")
+u_edges_plus_d_edges_to_ud_edges = ar.array('H')
+u_edges_plus_d_edges_to_ud_edges.fromfile(fh, N_U_EDGES_PHASE2 * N_PERM_4)
+
+distance = ar.array('b', [0 for i in range(60)])
+for i in range(20):
+    for j in range(3):
+        distance[3*i + j] = (i // 3) * 3 + j
+        if i % 3 == 2 and j == 0:
+            distance[3 * i + j] += 3
+        elif i % 3 == 0 and j == 2:
+            distance[3 * i + j] -= 3
