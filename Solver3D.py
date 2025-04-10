@@ -284,12 +284,21 @@ def GetUDSliceCoord(edgeList, refEdge):
 def GetP2Coord(pieceList, refList):
     return GetCornerPermCoord(pieceList[0], refList[0]) + GetEdgePermCoord(pieceList[1], refList[1]) + GetUDSliceCoord(pieceList[1], refList[1])
 
-def PhaseTwo(cube: cb.CubieCube, ref = cubeRef):
+def PhaseTwo(cube: cb.CubieCube):
     solve = False
-    open = [(cube, -1, None)]
+    open = [(cube, -1, None, None)]
     close = []
     minimalIndex = 0
+    mindist = 0
+
+    corners = cube.GetCornerPermCoord()
+    edges = cube.GetUDEdgeCoord()
+    slicePerm = cube.GetUDSlicePerm()
     while not solve and len(open) > 0:
+        corners = cube.GetCornerPermCoord()
+        edges = cube.GetUDEdgeCoord()
+        slicePerm = cube.GetUDSlicePerm()
+
         distList = []
         for i in open:
             distList.append(i[1])
@@ -301,18 +310,19 @@ def PhaseTwo(cube: cb.CubieCube, ref = cubeRef):
         else:
             minConfig = open[minimalIndex]
             cube.configuration = CopyConfig(minConfig)
+            mindist = minConfig[2]
 
             for m in Moves.MOVELIST.value:
                 if m not in [Moves.R1.value, Moves.R3.value, Moves.L1.value, Moves.L3.value, Moves.F1.value, Moves.F3.value, Moves.B1.value, Moves.B3.value]:
-                    ApplyMove(m, cube)
-                    inClose = False
-                    for c in (close + open):
-                        if c[0].isInClass(cube.coinsEtAretes()):
-                            inClose = True
-                    
-                    if not inClose:
-                        open.append((SymClass(cube, ref), len(close), m))
-                    cube.configuration = CopyConfig(minConfig)
+                    newCorners = prT.corners_move[18*corners + m.value]
+                    newUDEdges = prT.ud_edges_move[18*edges + m.value]
+
+                    classId = prT.corner_classidx[newCorners]
+                    symetrie = prT.corner_sym[newCorners]
+                    newDistMod3 = prT.get_corners_ud_edges_depth3(40320*classId + prT.ud_edges_conj[(newUDEdges << 4) + symetrie])
+                    newDist = prT.distance[3*mindist + newDistMod3]
+
+                    open.append()
             
             close.append(open[minimalIndex])
             open.pop(minimalIndex)

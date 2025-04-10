@@ -173,6 +173,12 @@ class CubieCube:
             c = 3*c + self.cornerOri[i]
         return c
     
+    def GetEdgeOriCoord(self):
+        c = 0
+        for i in range(12):
+            c = 3*c + self.edgeOri[i]
+        return c
+
     def GetUDEdgePerm(self):
         perm = list(self.cornerPerm)
         c = 0
@@ -254,31 +260,6 @@ class CubieCube:
             permutation = (j+1)*permutation+k
         
         return 24*location + permutation
-
-    def SetCorner(self, cpCoord):
-        self.cornerPerm = [i for i in Coins]
-        for j in range(8):
-            k = cpCoord % (j + 1)
-            cpCoord //= j + 1
-            while k > 0:
-                temp = self.cornerPerm[j]
-                for i in range(j, 0, -1):
-                    self.cornerPerm[j] = self.cornerPerm[j-1]
-                self.cornerPerm[0] = temp
-                k -= 1
-    
-    def SetUDEdges(self, epCoord):
-        for i in list(Aretes)[0:8]:
-            self.edgePerm[i.value] = i
-        for j in list(Aretes)[0:8]:
-            k = epCoord % (j.value + 1)
-            epCoord //= j.value + 1
-            while k > 0:
-                temp = self.edgePerm[j]
-                for i in range(j.value, 0, -1):
-                    self.edgePerm[j] = self.edgePerm[j-1]
-                self.edgePerm[0] = temp
-                k -= 1
     
 standardMove = [0]*6
 standardMove[0] = CubieCube(None, cpU, coU, epU, eoU)
