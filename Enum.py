@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 import pygame
 
 
@@ -47,19 +47,39 @@ class Coins(Enum):
     DBL = 6
     DRB = 7
 
-class Aretes(Enum):
-    FU = 0
-    FR = 1
-    FD = 2
-    FL = 3
-    BU = 4
-    BR = 5
-    BD = 6
-    BL = 7
-    LU = 8
-    LD = 9
-    RU = 10
-    RD = 11
+class Aretes(IntEnum):
+    UR = 0
+    UF = 1
+    UL = 2
+    UB = 3
+    DR = 4
+    DF = 5
+    DL = 6
+    DB = 7
+    FR = 8
+    FL = 9
+    BL = 10
+    BR = 11
+
+class Moves(IntEnum):
+    U1 = 0
+    U2 = 1
+    U3 = 2
+    R1 = 3
+    R2 = 4
+    R3 = 5
+    F1 = 6
+    F2 = 7
+    F3 = 8
+    D1 = 9
+    D2 = 10
+    D3 = 11
+    L1 = 12
+    L2 = 13
+    L3 = 14
+    B1 = 15
+    B2 = 16
+    B3 = 17
 
 # Pour l'enchaînement des fenêtres :
 QUITTER = -1
