@@ -58,7 +58,7 @@ class SolverThread(thr.Thread):
                 if self.inv == 1:  # we solved the inverse cube
                     man = list(reversed(man))
                     man[:] = [Moves((m // 3) * 3 + (2 - m % 3)) for m in man]  # R1->R3, R2->R2, R3->R1 etc.
-                man[:] = [Moves(prT.conj_move[prT.N_MOVE * 16 * self.rot + m]) for m in man]
+                man[:] = [Moves(cubie.conjMove[prT.N_MOVE * 16 * self.rot + m]) for m in man]
                 self.solutions.append(man)
                 self.shortest_length[0] = len(man)
 
@@ -117,7 +117,7 @@ class SolverThread(thr.Thread):
             if m in [Moves.R3, Moves.F3, Moves.L3, Moves.B3]:  # phase 1 solution come in pairs
                 corners = prT.corners_move[18 * self.cornersave + m - 1]  # apply R2, F2, L2 ord B2 on last ph1 solution
             else:
-                corners = self.cc.corners
+                corners = self.cb_cube.GetCornerPermCoord()
                 for m in self.sofar_phase1:  # get current corner configuration
                     corners = prT.corners_move[18 * corners + m]
                 self.cornersave = corners
@@ -176,24 +176,23 @@ class SolverThread(thr.Thread):
     def run(self):
         cb = None
         if self.rot == 0:  # no rotation
-            cb = cubie.CubieCube(self.cb_cube.cp, self.cb_cube.co, self.cb_cube.ep, self.cb_cube.eo)
+            cb = cubie.CubieCube(None, self.cb_cube.cornerPerm, self.cb_cube.cornerOri, self.cb_cube.edgePerm, self.cb_cube.edgeOri)
         elif self.rot == 1:  # conjugation by 120° rotation
-            cb = cubie.CubieCube(prT.symCube[32].cp, prT.symCube[32].co, prT.symCube[32].ep, prT.symCube[32].eo)
-            cb.multiply(self.cb_cube)
-            cb.multiply(prT.symCube[16])
+            cb = cubie.CubieCube(None, cubie.sTable[32].cornerPerm, cubie.sTable[32].cornerOri, cubie.sTable[32].edgePerm, cubie.sTable[32].edgeOri)
+            cb.Composition(self.cb_cube)
+            cb.Composition(cubie.sTable[16])
         elif self.rot == 2:  # conjugation by 240° rotation
-            cb = cubie.CubieCube(prT.symCube[16].cp, prT.symCube[16].co, prT.symCube[16].ep, prT.symCube[16].eo)
-            cb.multiply(self.cb_cube)
-            cb.multiply(prT.symCube[32])
+            cb = cubie.CubieCube(None, cubie.sTable[16].cornerPerm, cubie.sTable[16].cornerPerm, cubie.sTable[16].edgePerm, cubie.sTable[16].edgeOri)
+            cb.Composition(self.cb_cube)
+            cb.Composition(cubie.sTable[32])
         if self.inv == 1:  # invert cube
-            tmp = cubie.CubieCube()
-            cb.inv_cubie_cube(tmp)
+            tmp = cb.InvCube()
             cb = tmp
 
-        dist = get_depth_phase1()
+        dist = get_depth_phase1(self.cb_cube)
         for togo1 in range(dist, 20):  # iterative deepening, solution has at least dist moves
             self.sofar_phase1 = []
-            self.search(self.cb_cube.GetCornerOriCoord(), self.cb_cube.GetEdgeOriCoord(), self.cb_cube.GetUDSliceCoord, dist, togo1)
+            self.search(self.cb_cube.GetCornerOriCoord(), self.cb_cube.GetEdgeOriCoord(), self.cb_cube.GetUDSliceCoord(), dist, togo1)
 
 
 # ################################End class SolverThread################################################################
@@ -234,6 +233,7 @@ def solve(cube: rubiks.RubiksCube, max_length=20, timeout=3):
     if len(solutions) > 0:
         for m in solutions[-1]:  # the last solution is the shortest
             s += m.name + ' '
+    print(s + '(' + str(len(s) // 3) + 'f)')
     return s + '(' + str(len(s) // 3) + 'f)'
 
 ########################################################################################################################

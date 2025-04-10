@@ -11,6 +11,7 @@ from Enum import *
 from Solver3D import *
 import CubieCube as cc
 import RubiksCubeTailleN
+import solverHKociemba as solv
 
 
 
@@ -334,13 +335,16 @@ def afficherRubiksCube(rubiksCube) -> None:
                 scramble = generateScrambleSubGroup()
                 jouerFormule(scramble, rubiksCube)
             if keys[pygame.K_s]:
-                c, e = rubiksCube.coinsEtAretes()
                 #print(GetEdgePermCoord(e, refE))
-                Solve(rubiksCube)
+                solv.solve(rubiksCube)
             if keys[pygame.K_t]:
                 test = cc.CubieCube(rubiksCube)
-                #test.Move(Moves.F1)
-                print("yes")
+                print(test.GetCornerPermCoord())
+                print(test.GetCornerOriCoord())
+                print(test.GetEdgeOriCoord())
+                print(test.GetUDSliceCoord())
+                print(test.GetUEdgeCoord())
+                print(test.GetDEdgeCoord())
 
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)

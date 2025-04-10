@@ -250,19 +250,6 @@ def GetEdgePermCoord(pieceList, ref):
 
     return coord
 
-def GetOriCoord(pieceList, ref, mod: CoordMod):
-    coord = 0
-    for i in pieceList:
-        for j in ref:
-            if ComparePiece(i, j):
-                b = 0
-                for c in i:
-                    if c != j[0]:
-                        b += 1
-                    else:
-                        break
-                coord += b*pow(mod.value, pieceList.index(i))
-
     return coord
 
 def GetUDSliceCoord(edgeList, refEdge):

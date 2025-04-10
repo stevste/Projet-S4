@@ -1,13 +1,18 @@
 from Enum import *
 from movesAndSymetrie import *
 from RubiksCubeTailleN import RubiksCube
-from Solver3D import ComparePiece
 import math
 
 N_PERM_COORD = 40320
 N_CORNERS_CLASS = 2768
 
 cubeRef = RubiksCube()
+
+def ComparePiece(p1, p2):
+    for i in p2:
+        if i not in p1:
+            return False
+    return True
 class CubieCube:
     def __init__(self, FaceletCube = None, cp = None, co = None, ep = None, eo = None):
         self.cornerPerm = []
@@ -144,9 +149,9 @@ class CubieCube:
         s = []
         for i in range(48):
             c = CubieCube()
-            c.Composition(standardSym[j])
+            c.Composition(standardSym[i])
             c.Composition(self)
-            c.Composition(standardSym[invId[j]])
+            c.Composition(standardSym[invId[i]])
 
             if self == c:
                 s.append(j)
@@ -164,19 +169,19 @@ class CubieCube:
             k=0
             while perm[i].value != i:
                 MoveUp(perm, 0, i)
-            c = (j+1)*c+k
+            c = (i+1)*c+k
         return c
 
     def GetCornerOriCoord(self):
         c = 0
-        for i in range(8):
+        for i in range(7):
             c = 3*c + self.cornerOri[i]
         return c
     
     def GetEdgeOriCoord(self):
         c = 0
-        for i in range(12):
-            c = 3*c + self.edgeOri[i]
+        for i in range(11):
+            c = 2*c + self.edgeOri[i]
         return c
 
     def GetUDEdgePerm(self):
@@ -187,7 +192,7 @@ class CubieCube:
             while perm[i].value != i:
                 MoveUp(perm, 0, i)
                 k += 1
-            c = (j+1)*c+k
+            c = (i+1)*c+k
         return c
 
     def GetUDSliceCoord(self):
@@ -195,21 +200,21 @@ class CubieCube:
         k = 0
         sliceEdgePos = [0]*4
 
-        for i in range(11, 0, -1):
-            if 8 <= self.edgePerm[j] <= 11:
-                location += math.comb(11-j, k+1)
-                sliceEdgePos[3-k] = self.edgePerm[j]
+        for i in range(11, -1, -1):
+            if 8 <= self.edgePerm[i] <= 11:
+                location += math.comb(11-i, k+1)
+                sliceEdgePos[3-k] = self.edgePerm[i]
                 k += 1
         
         permutation = 0
         for i in range(3, 0, -1):
             k = 0
-            while sliceEdgePos[i].value != i:
+            while sliceEdgePos[i] != i+8:
                 MoveUp(sliceEdgePos, 0, i)
                 k += 1
-            permutation = (j+1)*permutation+k
+            permutation = (i+1)*permutation+k
         
-        return 24*sliceEdgePos + permutation
+        return 24*location + permutation
 
     def GetUEdgeCoord(self):
         location = 0
@@ -220,19 +225,18 @@ class CubieCube:
         for i in range(4):
             MoveDown(perm, 0, 11)
 
-        for i in range(11, 0, -1):
-            if 0 <= perm[j] <= 3:
-                location += math.comb(11-j, k+1)
-                UEdgePos[3-k] = perm[j]
+        for i in range(11, -1, -1):
+            if 0 <= perm[i] <= 3:
+                location += math.comb(11-i, k+1)
+                UEdgePos[3-k] = perm[i]
                 k += 1
         
         permutation = 0
         for i in range(3, 0, -1):
             k = 0
-            while UEdgePos[i].value != i:
-                temp = UEdgePos[0]
+            while UEdgePos[i] != i:
                 MoveUp(UEdgePos, 0, i)
-            permutation = (j+1)*permutation+k
+            permutation = (i+1)*permutation+k
         
         return 24*location + permutation
 
@@ -245,19 +249,18 @@ class CubieCube:
         for i in range(4):
             MoveDown(perm, 0, 11)
 
-        for i in range(11, 0, -1):
-            if 4 <= perm[j] <= 7:
-                location += math.comb(11-j, k+1)
-                UEdgePos[3-k] = perm[j]
+        for i in range(11, -1, -1):
+            if 4 <= perm[i] <= 7:
+                location += math.comb(11-i, k+1)
+                UEdgePos[3-k] = perm[i]
                 k += 1
     
         permutation = 0
         for i in range(3, 0, -1):
             k = 0
-            while UEdgePos[i].value != i:
-                temp = UEdgePos[0]
+            while UEdgePos[i].value != i+4:
                 MoveUp(UEdgePos, 0, i)
-            permutation = (j+1)*permutation+k
+            permutation = (i+1)*permutation+k
         
         return 24*location + permutation
     
@@ -284,13 +287,13 @@ standardSym[2] = CubieCube(None, cpROT_U4, coROT_U4, epROT_U4, eoROT_U4)
 standardSym[3] = CubieCube(None, cpMIRR_LR2, coMIRR_LR2, epMIRR_LR2, eoMIRR_LR2)
 
 sCube = CubieCube()
-sTable = [0]*48
+sTable = []
 
 for i in range(3):
     for j in range(2):
         for k in range(4):
             for l in range(2):
-                sTable.append(None, sCube.cornerPerm, sCube.cornerOri, sCube.edgePerm, sCube.edgeOri)
+                sTable.append(CubieCube(None, sCube.cornerPerm, sCube.cornerOri, sCube.edgePerm, sCube.edgeOri))
                 sCube.Composition(standardSym[0])
             sCube.Composition(standardSym[1])
         sCube.Composition(standardSym[2])
@@ -300,10 +303,22 @@ invId = [0] * 48
 for j in range(48):
     for i in range(48):
         cc = CubieCube(None, sTable[j].cornerPerm, sTable[j].cornerOri, sTable[j].edgePerm, sTable[j].edgeOri)
-        cc.corner_multiply(sTable[i])
+        cc.Composition(sTable[i])
         if cc.cornerPerm[Coins.URF.value] == Coins.URF.value and cc.cornerPerm[Coins.UFL.value] == Coins.UFL.value and cc.cornerPerm[Coins.ULB.value] == Coins.ULB:
             invId[j] = i
             break
+
+conjMove = [0]*(48*18)
+for i in range(48):
+    for m in Moves:
+        cb = CubieCube()
+        cb.Composition(sTable[i])
+        cb.Move(m)
+        cb.Composition(sTable[invId[i]])
+
+        for j in Moves:
+            if cb == moveTable[j]:
+                conjMove[18*i + m] = j
 
 def MoveDown(liste: list, top, bot):
     temp = liste[bot]
