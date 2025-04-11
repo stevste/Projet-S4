@@ -6,6 +6,9 @@ import numpy as np
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import sys
+sys.path.append("RubiksCube-TwophaseSolver/")
+import solver
 
 from Enum import *
 
@@ -397,6 +400,8 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
             elif keys[pygame.K_t]:
                 test = rubiksCube.GetCubie()
                 print("yes")
+            elif keys[pygame.K_s]:
+                print(solver.solve(rubiksCube))
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)
             historiqueRotations.append((10, baseCamera, Axes.X))
