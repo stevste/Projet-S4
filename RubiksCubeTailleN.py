@@ -111,16 +111,22 @@ class RubiksCube:
         
         for couronne in couronnesATourner:
             if nomFace == Faces.FRONT:
+                self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.Y, couronne, -sens.value)
             elif nomFace == Faces.BACK:
+                self.sensRotationEnCours = -sens.value
                 self.pivoterPlan(Axes.Y, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.LEFT:
+                self.sensRotationEnCours = -sens.value
                 self.pivoterPlan(Axes.X, couronne, -sens.value)
             elif nomFace == Faces.RIGHT:
+                self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.X, self.taille+1 - couronne, sens.value)
             elif nomFace == Faces.DOWN:
+                self.sensRotationEnCours = -sens.value
                 self.pivoterPlan(Axes.Z, couronne, -sens.value)
             else: # nomFace == Faces.UP:
+                self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens.value)
     
     def coinsEtAretes(self):
@@ -202,7 +208,7 @@ class RubiksCube:
                     self.AjouterAction((Faces.DOWN, Sens.HORAIRE))
                     self.AjouterAction((Faces.DOWN, Sens.HORAIRE))
                 case Moves.D3.value:
-                    self.AjouterAction(Faces.DOWN, Sens.ANTIHORAIRE)
+                    self.AjouterAction((Faces.DOWN, Sens.ANTIHORAIRE))
                 case Moves.R1.value:
                     self.AjouterAction((Faces.RIGHT, Sens.HORAIRE))
                 case Moves.R2.value:

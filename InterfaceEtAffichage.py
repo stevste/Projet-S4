@@ -402,7 +402,7 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.BACK.value], sensRotation)
                 rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.BACK.value].value]
             elif keys[pygame.K_t]:
-                test = rubiksCube.GetCubie()
+                rubiksCube.AjouterAction((Faces.UP, Sens.ANTIHORAIRE))
                 print("yes")
             elif keys[pygame.K_s]:
                 rubiksCube.jouerFormule(solver.solve(rubiksCube))
