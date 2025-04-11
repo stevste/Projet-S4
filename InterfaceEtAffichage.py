@@ -372,6 +372,10 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
                 positionClicSouris = positionSouris
         else:
             positionClicSouris = None
+
+        if len(rubiksCube.listActions) > 0 and (not rubiksCube.mouvementEnCours):
+            rubiksCube.pivoterFace(rubiksCube.listActions[0][0], rubiksCube.listActions[0][1])
+            del rubiksCube.listActions[0]
         
         if not rubiksCube.mouvementEnCours:
             if keys[pygame.K_TAB] or keys[pygame.K_4]: # touche Tab ou prime
@@ -401,7 +405,7 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
                 test = rubiksCube.GetCubie()
                 print("yes")
             elif keys[pygame.K_s]:
-                print(solver.solve(rubiksCube))
+                rubiksCube.jouerFormule(solver.solve(rubiksCube))
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)
             historiqueRotations.append((10, baseCamera, Axes.X))

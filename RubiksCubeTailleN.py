@@ -38,6 +38,7 @@ class RubiksCube:
         self.abscisseFaceEnRotation:int = 0 # abscisse selon l'axe de rotation (peut être X, Y ou Z)
         self.angleRotationEnCours = 0 # en degrés
         self.configurationAnterieure = self.configuration
+        self.listActions = [] # Actions sous la forme: (Faces, sens)
         
         # Pour la mise en rotation avec la souris :
         self.caseCliquee = [None, (None, None)] # [Face, (ligne, colonne)]
@@ -57,6 +58,9 @@ class RubiksCube:
             texte += '\n'
         return texte + '----------'
     
+    def AjouterAction(self, action: tuple):
+        self.listActions.append(action)
+
     def pivoterPlan(self, axe:int=Axes.X, abscisseFace:int=0, sens=Sens.HORAIRE.value) -> None:
         self.abscisseFaceEnRotation = abscisseFace
         xAParcourir = range(self.taille +2)
@@ -182,36 +186,59 @@ class RubiksCube:
 
         return result
 
-
-def test_coinsEtAretes():
-    cube = RubiksCube()
-    cube.pivoterFace(Faces.DOWN)
-    cube.pivoterFace(Faces.RIGHT)
-    cube.pivoterFace(Faces.LEFT)
-    cube.pivoterFace(Faces.UP)
-    cube.pivoterFace(Faces.DOWN)
-    cube.pivoterFace(Faces.RIGHT)
-
-    coins, aretes = cube.coinsEtAretes()
-    couleurs = ['bleu', 'vert', 'rouge', 'orange', 'blanc', 'jaune']
-    
-    testCoins = []
-    for coin in coins:
-        testCoins.append((couleurs[coin[0].value], couleurs[coin[1].value], couleurs[coin[2].value]))
-    print(testCoins)
-    
-    testAretes = []
-    for arete in aretes:
-        testAretes.append((couleurs[arete[0].value], couleurs[arete[1].value]))
-    print(testAretes)
-    
+    def jouerFormule(self, formule: list):
+        for m in formule:
+            match m:
+                case Moves.U1.value:
+                    self.AjouterAction((Faces.UP, Sens.HORAIRE))
+                case Moves.U2.value:
+                    self.AjouterAction((Faces.UP, Sens.HORAIRE))
+                    self.AjouterAction((Faces.UP, Sens.HORAIRE))
+                case Moves.U3.value:
+                    self.AjouterAction((Faces.UP, Sens.ANTIHORAIRE))
+                case Moves.D1.value:
+                    self.AjouterAction((Faces.DOWN, Sens.HORAIRE))
+                case Moves.D2.value:
+                    self.AjouterAction((Faces.DOWN, Sens.HORAIRE))
+                    self.AjouterAction((Faces.DOWN, Sens.HORAIRE))
+                case Moves.D3.value:
+                    self.AjouterAction(Faces.DOWN, Sens.ANTIHORAIRE)
+                case Moves.R1.value:
+                    self.AjouterAction((Faces.RIGHT, Sens.HORAIRE))
+                case Moves.R2.value:
+                    self.AjouterAction((Faces.RIGHT, Sens.HORAIRE))
+                    self.AjouterAction((Faces.RIGHT, Sens.HORAIRE))
+                case Moves.R3.value:
+                    self.AjouterAction((Faces.RIGHT, Sens.ANTIHORAIRE))
+                case Moves.L1.value:
+                    self.AjouterAction((Faces.LEFT, Sens.HORAIRE))
+                case Moves.L2.value:
+                    self.AjouterAction((Faces.LEFT, Sens.HORAIRE))
+                    self.AjouterAction((Faces.LEFT, Sens.HORAIRE))
+                case Moves.L3.value:
+                    self.AjouterAction((Faces.LEFT, Sens.ANTIHORAIRE))
+                case Moves.F1.value:
+                    self.AjouterAction((Faces.FRONT, Sens.HORAIRE))
+                case Moves.F2.value:
+                    self.AjouterAction((Faces.FRONT, Sens.HORAIRE))
+                    self.AjouterAction((Faces.FRONT, Sens.HORAIRE))
+                case Moves.F3.value:
+                    self.AjouterAction((Faces.FRONT, Sens.ANTIHORAIRE))
+                case Moves.B1.value:
+                    self.AjouterAction((Faces.BACK, Sens.HORAIRE))
+                case Moves.B2.value:
+                    self.AjouterAction((Faces.BACK, Sens.HORAIRE))
+                    self.AjouterAction((Faces.BACK, Sens.HORAIRE))
+                case Moves.B3.value:
+                    self.AjouterAction((Faces.BACK, Sens.ANTIHORAIRE))
+   
 #test_coinsEtAretes()
 
 #cube = RubiksCube()
-#cube.coinsEtAretes()
+#self.coinsEtAretes()
 '''print(cube)
-cube.pivoterFace(Faces.DOWN, Sens.HORAIRE)
+self.pivoterFace(Faces.DOWN, Sens.HORAIRE)
 print(cube)
-cube.pivoterFace(Faces.RIGHT, Sens.HORAIRE)
+self.pivoterFace(Faces.RIGHT, Sens.HORAIRE)
 print(cube)
 '''
