@@ -121,14 +121,14 @@ class RubiksCube:
     
     def coinsEtAretes(self):
         c = self.configuration
-        coins = [(c[0][self.taille][1], c[1][self.taille][0], c[1][self.taille+1][1]), # URF
-                 (c[0][self.taille][self.taille], c[1][self.taille+1][self.taille], c[1][self.taille][self.taille+1]), # UFL
-                 (c[0][1][self.taille], c[1][1][self.taille+1], c[1][0][self.taille]), # ULB
-                 (c[0][1][1], c[1][0][1], c[1][1][0]), # UBR
-                 (c[self.taille+1][self.taille][1], c[self.taille][self.taille+1][1], c[self.taille][self.taille][0]), # DFR
-                 (c[self.taille+1][self.taille][self.taille], c[self.taille][self.taille][self.taille+1], c[self.taille][self.taille+1][self.taille]), # DLF
-                 (c[self.taille+1][1][self.taille], c[self.taille][0][self.taille], c[self.taille][1][self.taille+1]), # DBL
-                 (c[self.taille+1][1][1], c[self.taille][1][0], c[self.taille][0][1])] # DRB
+        coins = [(c[self.taille][1][self.taille+1], c[self.taille+1][1][self.taille], c[self.taille][0][self.taille]), #URF
+                (c[1][1][self.taille+1], c[1][0][self.taille], c[0][1][self.taille]), #UFL
+                (c[1][self.taille][self.taille+1], c[0][self.taille][self.taille], c[1][self.taille+1][self.taille]), # ULB
+                (c[self.taille][self.taille][self.taille+1], c[self.taille][self.taille+1][self.taille], c[self.taille+1][self.taille][self.taille]), # UBR
+                (c[self.taille][1][0], c[self.taille][0][1], c[self.taille+1][1][1]), # DFR
+                (c[1][1][0], c[0][1][1], c[1][0][1]), # DLF
+                (c[1][self.taille][0], c[1][self.taille+1][1], c[0][self.taille][1]), # DBL
+                (c[self.taille][self.taille][0], c[self.taille+1][self.taille][1], c[self.taille][self.taille+1][1])] # DRB
             
         aretes = [(c[self.taille][2][self.taille+1], c[self.taille+1][2][self.taille]), # UR
                     (c[2][1][self.taille+1], c[2][0][self.taille]), #UF
