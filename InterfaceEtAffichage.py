@@ -394,7 +394,9 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
             elif keys[pygame.K_b]:
                 rubiksCube.pivoterFace(positionFacesVuesParCamera[Faces.BACK.value], sensRotation)
                 rubiksCube.sensRotationEnCours = sensRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[Faces.BACK.value].value]
-
+            elif keys[pygame.K_t]:
+                test = rubiksCube.GetCubie()
+                print("yes")
         if keys[pygame.K_UP]:
             baseCamera = tournerCube(10, baseCamera, Axes.X)
             historiqueRotations.append((10, baseCamera, Axes.X))

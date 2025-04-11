@@ -1,7 +1,9 @@
 from Enum import *
 import copy
-
-
+import sys
+sys.path.append("RubiksCube-TwophaseSolver/")
+import cubie as cb
+from enums import *
 class RubiksCube:
     def __init__(self, taille:int=3):
         self.taille = taille # nombre de petits cubes sur une arête du Rubik's
@@ -117,7 +119,7 @@ class RubiksCube:
             else: # nomFace == Faces.UP:
                 self.pivoterPlan(Axes.Z, self.taille+1 - couronne, sens.value)
     
-    def coinsEtAretes(self): # avec la face verte devant et la face orange en haut
+    def coinsEtAretes(self):
         c = self.configuration
         coins = [(c[0][self.taille][1], c[1][self.taille][0], c[1][self.taille+1][1]), # URF
                  (c[0][self.taille][self.taille], c[1][self.taille+1][self.taille], c[1][self.taille][self.taille+1]), # UFL
@@ -142,6 +144,43 @@ class RubiksCube:
                     (c[self.taille][self.taille+1][2], c[self.taille+1][self.taille][2])] # BR
         
         return coins, aretes
+
+    def GetCubie(self):
+        """transforme le cube en cube interpretable pour le solver
+        """
+        def ComparePiece(p1, p2):
+            for i in p2:
+                if i not in p1:
+                    return False
+            return True
+        
+        result = cb.CubieCube()
+        cubeRef = RubiksCube()
+        cFacelet, eFacelet = self.coinsEtAretes()
+        cRef, eRef = cubeRef.coinsEtAretes()
+
+        for i in range(len(cFacelet)):
+            for j in range(len(cRef)):
+                if ComparePiece(cFacelet[i], cRef[j]):
+                    result.cp[i] = Corner(j)
+                    b = 0
+                    for c in cFacelet[i]:
+                        if c != cRef[j][0]:
+                            b += 1
+                        else:
+                            break
+                    result.co[i] = b
+        
+        for i in range(len(eFacelet)):
+            for j in range(len(eRef)):
+                if ComparePiece(eFacelet[i], eRef[j]):
+                    result.ep[i] = Edge(j)
+                    if eFacelet[i][0] != eRef[j][0]:
+                        result.eo[i] = 1
+                    else:
+                        result.eo[i] = 0
+
+        return result
 
 
 def test_coinsEtAretes():
