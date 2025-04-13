@@ -28,7 +28,7 @@ def dessinerCube(origine:tuple, baseLocale:tuple, couleur:tuple) -> None:
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[0][0], origine[1]+baseLocale[0][1], origine[2]+baseLocale[0][2]), (origine[0]+baseLocale[0][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[2][2]), (origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), couleur) # Face inférieure
 
 
-def dessinerRubiksCube(rubiksCube) -> None:
+def dessinerRubiksCube(rubiksCube, afficherAxes:bool, baseCamera) -> None:
     glBegin(GL_QUADS)
     origine = (-(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2)
     
@@ -84,6 +84,29 @@ def dessinerRubiksCube(rubiksCube) -> None:
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]-0.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]-0.001*uZ[2]), couleur)
     glEnd()
     
+    if afficherAxes:
+        glBegin(GL_LINES)
+        glColor3f(1,0,0) # x monde
+        glVertex3fv((0,0,0))
+        glVertex3fv((3,0,0))
+        glColor3f(0,0.8,0) # y monde
+        glVertex3fv((0,0,0))
+        glVertex3fv((0,3,0))
+        glColor3f(0,0,1) # z monde
+        glVertex3fv((0,0,0))
+        glVertex3fv((0,0,3))
+        
+        glColor3f(1,0.5,0.5) # x caméra
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[0][0]*4, baseCamera[0][1]*4, baseCamera[0][2]*4))
+        glColor3f(0.5,1,0.5) # y caméra
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[1][0]*4, baseCamera[1][1]*4, baseCamera[1][2]*4))
+        glColor3f(0.6,0.6,1) # z caméra
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[2][0]*4, baseCamera[2][1]*4, baseCamera[2][2]*4))
+        glEnd()
+    
 
 def tournerCube(angle:float, baseCamera:list, axe=Axes.X) -> list:
     nouvelleBaseCamera = [(), (), ()]
@@ -110,8 +133,8 @@ def tournerCube(angle:float, baseCamera:list, axe=Axes.X) -> list:
 
 
 def determinerPositionFacesCamera(baseCamera:list) -> list: # pour savoir quelles sont les faces devant, à gauche, à droite... depuis le point de vue de l'utilisateur
-    orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
-    directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
+    orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # vecteurs normaux aux faces FRONT, BACK, RIGHT, LEFT, UP, DOWN du cube
+    directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # directions FRONT, BACK, RIGHT, LEFT, UP, DOWN  dans la base de la caméra
     facesVuesParCamera = [None, None, None, None, None, None] # sera rempli avec la face la plus proche de la position FRONT, BACK, RIGHT, LEFT, UP, DOWN pour l'observateur
 
     for direction in [Faces.FRONT, Faces.BACK, Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN]:
@@ -124,7 +147,7 @@ def determinerPositionFacesCamera(baseCamera:list) -> list: # pour savoir quelle
             
     return facesVuesParCamera
 
-# Fonction pour faire des tests (même que celle au-dessus mais avec des print):
+'''# Fonction pour faire des tests (même que celle au-dessus mais avec des print):
 def determinerPositionFacesCameraPrint(baseCamera:list) -> list: # pour savoir quelles sont les faces devant, à gauche, à droite... depuis le point de vue de l'utilisateur
     orientationFaces = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1)) # FRONT, BACK, RIGHT, LEFT, UP, DOWN
     directionsBaseCamera = ((0,-1,0), (0,1,0), (1,0,0), (-1,0,0), (0,0,1), (0,0,-1))
@@ -151,7 +174,7 @@ def verifierCoherence(facesVuesParCamera:list) -> bool:
                     return False
         return True
     else:
-        return False
+        return False'''
 
 
 def determinerEquationDroite(point1:tuple, point2:tuple) -> tuple: # équation "ax + by + c = 0" de la droite passant par les deux points donnés, renvoie a, b et c en pixels
@@ -183,7 +206,7 @@ def visible(face:Faces, baseCamera:list) -> bool:
         return False
     
 
-def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> int:    
+def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamera:list, rubiksCube) -> None:    
     # Faces composant les coins (URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB):
     coins = ((Faces.UP, Faces.RIGHT, Faces.FRONT), (Faces.UP, Faces.FRONT, Faces.LEFT), (Faces.UP, Faces.LEFT, Faces.BACK), (Faces.UP, Faces.BACK, Faces.RIGHT), (Faces.DOWN, Faces.FRONT, Faces.RIGHT), (Faces.DOWN, Faces.LEFT, Faces.FRONT), (Faces.DOWN, Faces.BACK, Faces.LEFT), (Faces.DOWN, Faces.RIGHT, Faces.BACK))
     
@@ -253,14 +276,12 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                     
                     positionRelativeFaces = [[Faces.RIGHT, Faces.LEFT, Faces.UP, Faces.DOWN], [], [Faces.BACK, Faces.FRONT, Faces.UP, Faces.DOWN], [Faces.FRONT, Faces.BACK, Faces.UP, Faces.DOWN], [Faces.RIGHT, Faces.LEFT, Faces.BACK, Faces.FRONT], [Faces.RIGHT, Faces.LEFT, Faces.FRONT, Faces.BACK]]
                     
-                    #print(ligne, colonne, variationCase)
                     if variationCase[0] != 0: # changement de ligne
                         if rubiksCube.caseCliquee[1][1]-variationCase[1] <= rubiksCube.taille/2:
                             if variationCase[0] == 1:
                                 sensDeRotation = Sens.ANTIHORAIRE
                             else:
                                 sensDeRotation = Sens.HORAIRE
-                            #print('gauche', sensDeRotation, rubiksCube.caseCliquee[1][1]-variationCase[1])
                             rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][1].value], sensDeRotation, rubiksCube.caseCliquee[1][1]-variationCase[1])
                             rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][1].value].value]
         
@@ -269,7 +290,6 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                                 sensDeRotation = Sens.HORAIRE
                             else:
                                 sensDeRotation = Sens.ANTIHORAIRE
-                            #print('droite', sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][1]-variationCase[1] -1))
                             rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][0].value], sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][1]-variationCase[1] -1))
                             rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][0].value].value]
                     
@@ -279,7 +299,6 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                                 sensDeRotation = Sens.HORAIRE
                             else:
                                 sensDeRotation = Sens.ANTIHORAIRE
-                            #print('bas', sensDeRotation, rubiksCube.caseCliquee[1][0])
                             rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][3].value], sensDeRotation, rubiksCube.caseCliquee[1][0])
                             rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][3].value].value]
         
@@ -288,21 +307,21 @@ def rotationFace(positionSouris:list, baseCamera:list, positionFacesVuesParCamer
                                 sensDeRotation = Sens.ANTIHORAIRE
                             else:
                                 sensDeRotation = Sens.HORAIRE
-                            #print('haut', sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][0] -1))
                             rubiksCube.pivoterFace(positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][2].value], sensDeRotation, rubiksCube.taille - (rubiksCube.caseCliquee[1][0] -1))
                             rubiksCube.sensRotationEnCours = sensDeRotation.value*Faces.SENS_ROTATIONS.value[positionFacesVuesParCamera[positionRelativeFaces[indexFaceVisible][2].value].value]
 
     
 
-def afficherRubiksCube(rubiksCube) -> None:
-    pygame.init()
-    dimensionsEcran = (800,600)
+def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
+    #pygame.init()
+    #dimensionsEcran = (800,600)
     pygame.display.set_mode(dimensionsEcran, DOUBLEBUF|OPENGL)
+    #pygame.display.gl_set_attribute(flag, value)
     pygame.display.set_caption("Rubik's Cube")
     
     baseCamera = [(1,0,0), (0,0,-1), (0,1,0)]
 
-    gluPerspective(40, dimensionsEcran[0]/dimensionsEcran[1], 5, 18)
+    gluPerspective(40, dimensionsEcran[0]/dimensionsEcran[1], 5, 21)
     glTranslatef(0,0,-3 -2*rubiksCube.taille)
     
     baseCamera = tournerCube(-30, baseCamera, Axes.Y)
@@ -316,14 +335,15 @@ def afficherRubiksCube(rubiksCube) -> None:
     positionClicSouris = None
     clicGaucheRotationCube = False
     mouvementEnCours = False
+    afficherAxes = False
     
-    running = True
-    while running:
+    fenetreSuivante = fenetreActuelle
+    while fenetreSuivante == fenetreActuelle:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-                sys.exit()
+                fenetreSuivante = QUITTER
+                #pygame.quit()
+                #sys.exit()
             
             if event.type == pygame.MOUSEBUTTONUP:
                 clicGaucheRotationCube = False
@@ -335,17 +355,26 @@ def afficherRubiksCube(rubiksCube) -> None:
                         baseCamera = tournerCube(-rotation[0], rotation[1], rotation[2])
                     historiqueRotations = [(-30, baseCamera, Axes.Y), (60, baseCamera, Axes.X)]
                 
-                if event.key == pygame.K_i: # info, on peut y mettre n'importe quel print d'une variable pour faire des tests
-                    print(determinerPositionFacesCameraPrint(baseCamera))
-        
+                elif event.key == pygame.K_x:
+                    fenetreSuivante = QUITTER
+                elif event.key == pygame.K_m:
+                    fenetreSuivante = MENU
+                elif event.key == pygame.K_c:
+                    fenetreSuivante = CUBES
+                elif event.key == pygame.K_a:
+                    if not afficherAxes:
+                        afficherAxes = True
+                    else:
+                        afficherAxes = False
+                    
         positionSouris = pygame.mouse.get_pos()
         keys = pygame.key.get_pressed()
         clicGaucheMaintenu = pygame.mouse.get_pressed(num_buttons=3)[0]
         clicDroitMaintenu = pygame.mouse.get_pressed(num_buttons=3)[2]
         
         positionFacesVuesParCamera = determinerPositionFacesCamera(baseCamera)
-        if not verifierCoherence(positionFacesVuesParCamera):
-            print("ATTENTION : problème de cohérence des faces vues par la caméra !")
+        '''if not verifierCoherence(positionFacesVuesParCamera):
+            print("ATTENTION : problème de cohérence des faces vues par la caméra !")'''
         
         if (clicGaucheMaintenu or keys[pygame.K_g]) and not clicGaucheRotationCube and not rubiksCube.mouvementEnCours: # pour plus de facilité sans souris, on prend "g" pour clic gauche et "h" pour clic droit
             positionAvecYVersLeHaut = (int(positionSouris[0]), int(dimensionsEcran[1]-positionSouris[1]))
@@ -417,9 +446,11 @@ def afficherRubiksCube(rubiksCube) -> None:
                 rubiksCube.mouvementEnCours = False
                 rubiksCube.configurationAnterieure = rubiksCube.configuration
         
-        glClearColor(0.3, 0.5, 0.5, 0)
+        glClearColor(0.6, 0.8, 0.8, 0)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        dessinerRubiksCube(rubiksCube)
+        dessinerRubiksCube(rubiksCube, afficherAxes, baseCamera)
         
         pygame.display.flip()
         pygame.time.wait(40)
+        
+    return fenetreSuivante
