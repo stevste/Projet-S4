@@ -421,6 +421,39 @@ def afficherCarre(screen, dimensionsEcran, taille, fenetreActuelle):
             if event.type == pygame.QUIT:
                 fenetreSuivante = QUITTER
             
+            if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_KP7:
+                    grille.pieceSelectionnee = (0,0)
+                if event.key==pygame.K_KP8:
+                    grille.pieceSelectionnee = (1,0)
+                if event.key==pygame.K_KP9:
+                    grille.pieceSelectionnee = (2,0)
+                if event.key==pygame.K_KP4:
+                    grille.pieceSelectionnee = (0,1)
+                if event.key==pygame.K_KP5:
+                    grille.pieceSelectionnee = (1,1)
+                if event.key==pygame.K_KP6:
+                    grille.pieceSelectionnee = (2,1)
+                if event.key==pygame.K_KP1:
+                    grille.pieceSelectionnee = (0,2)
+                if event.key==pygame.K_KP2:
+                    grille.pieceSelectionnee = (1,2)
+                if event.key==pygame.K_KP3:
+                    grille.pieceSelectionnee = (2,2)
+                
+                
+                elif event.key == pygame.K_UP and grille.pieceSelectionnee is not None:
+                    grille.deplacerColonne(grille.pieceSelectionnee[0], -1, screen, listeBoutons)
+                    
+                elif event.key == pygame.K_DOWN and grille.pieceSelectionnee is not None:
+                    grille.deplacerColonne(grille.pieceSelectionnee[0], 1, screen, listeBoutons )
+               
+                elif event.key == pygame.K_RIGHT and grille.pieceSelectionnee is not None:
+                    grille.deplacerLigne(grille.pieceSelectionnee[1], 1, screen, listeBoutons )
+                    
+                elif event.key == pygame.K_LEFT and grille.pieceSelectionnee is not None:
+                    grille.deplacerLigne(grille.pieceSelectionnee[1], -1, screen, listeBoutons )
+            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if grille.boutonSolveur.zoneCollision.collidepoint(positionSouris):
                     grille.boutonSolveur.appuye = True
