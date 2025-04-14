@@ -44,19 +44,20 @@ class Bouton:
 
 
 class Piece:
-    def __init__(self, position:tuple, taille:int, couleur:tuple, valeur:int, image, portionImage:tuple):
+
+    def __init__(self, position:tuple, taille:int, couleur:tuple, valeur:int, portionImage:tuple):
         self.position = position # [x,y] en pixels
         self.taille = taille # longueur côté en pixels
         self.positionArrivee = position
         self.couleur = couleur
         self.valeur = valeur
         self.texte = str(self.valeur)
-        self.image = image
+
         self.portionImage = portionImage # (x,y) : point à partir duquel la pièce découpe un carré de l'image fournie pour ensuite l'afficher
     
-    def dessiner(self, screen) -> None:
-        if self.image is not None:
-            screen.blit(self.image, self.position, (self.portionImage[0], self.portionImage[1], self.taille, self.taille))
+    def dessiner(self, screen, image=None) -> None:
+        if image is not None:
+            screen.blit(image, self.position, (self.portionImage[0], self.portionImage[1], self.taille, self.taille))
             pygame.draw.rect(screen, COULEUR_BORD_PIECES, pygame.Rect(self.position[0], self.position[1], self.taille, self.taille), 2)
         else:
             pygame.draw.rect(screen, self.couleur, pygame.Rect(self.position[0], self.position[1], self.taille, self.taille), 0, int(0.3*self.taille))
@@ -111,7 +112,7 @@ class Roulette:
 
 
 class Grille:
-    def __init__(self, tailleFenetre:tuple, coteCases:int, nombreLignes:int=3, nombreColonnes:int=3, configAvecTexte:list=[''], image=None):
+    def __init__(self, tailleFenetre:tuple, coteCases:int, nombreLignes:int=3, nombreColonnes:int=3, configAvecTexte:list=['']):
         if configAvecTexte != ['']: # un texte est précisé (comme [['] I', 'N', 'P'], ['p', '1', '2']] par exemple)
             nombreLignes = len(configAvecTexte)
             nombreColonnes = len(configAvecTexte[0])
@@ -127,7 +128,8 @@ class Grille:
             self.pieces.append([])
             self.configInitiale.append([])
             for colonne in range(nombreColonnes):
-                self.pieces[ligne].append(Piece([self.origine[0] + colonne*self.coteCases, self.origine[1] + ligne*self.coteCases], self.coteCases, COULEUR_PIECES, chiffre, image, (colonne*self.coteCases, ligne*self.coteCases)))
+
+                self.pieces[ligne].append(Piece([self.origine[0] + colonne*self.coteCases, self.origine[1] + ligne*self.coteCases], self.coteCases, COULEUR_PIECES, chiffre, (colonne*self.coteCases, ligne*self.coteCases)))
                 if configAvecTexte != ['']: # un texte est précisé (comme [['] I', 'N', 'P'], ['p', '1', '2']] par exemple)
                     self.pieces[ligne][colonne].texte = configAvecTexte[ligne][colonne]
                 self.configInitiale[ligne].append(chiffre)
@@ -176,7 +178,8 @@ class Grille:
             texte += '\n'
         return texte
         
-    def dessiner(self, screen) -> None:
+
+    def dessiner(self, screen, image=None) -> None:
         for ligne in range(len(self.roulettes)):
             for roulette in self.roulettes[ligne]:
                 roulette.dessiner(screen)
@@ -186,7 +189,8 @@ class Grille:
         
         for ligne in range(len(self.pieces)):
             for colonne in range(len(self.pieces[0])):
-                self.pieces[ligne][colonne].dessiner(screen)
+
+                self.pieces[ligne][colonne].dessiner(screen, image)
     
     def deplacerPieces(self) -> None:
         self.mouvementEnCours = False
@@ -327,15 +331,18 @@ class Grille:
         else:
             return []
 
-
-def afficherPivot(screen, dimensionsEcran:tuple, nbLignes:int, nbColonnes:int, configTexte:list=[''], image=None, fenetreActuelle=PIVOTS):
+def afficherPivot(screen, dimensionsEcran:tuple, nbLignes:int, nbColonnes:int, configTexte:list=[''], images=[], fenetreActuelle=PIVOTS):
     pygame.display.set_caption("Pivot")
     coteCases = int((dimensionsEcran[1]*0.6)/(1.2 + 0.5*nbLignes))
-
-    if image is not None:
-        image = pygame.transform.scale(image, (nbColonnes*coteCases, nbLignes*coteCases))
     
-    grille = Grille(dimensionsEcran, coteCases, nbLignes, nbColonnes, configTexte, image)
+    for indexImage in range(len(images)):
+        images[indexImage] = pygame.transform.scale(images[indexImage], (nbColonnes*coteCases, nbLignes*coteCases))
+    if images != []:
+        image = images[0]
+    else:
+        image = None
+
+    grille = Grille(dimensionsEcran, coteCases, nbLignes, nbColonnes, configTexte)
     
     boutonSolveur = Bouton((dimensionsEcran[0]*0.02, dimensionsEcran[1]*0.02), "Résoudre", (dimensionsEcran[0]*0.12, dimensionsEcran[1]*0.052), VERT, dimensionsEcran[1]/17, (dimensionsEcran[0]*0.008, dimensionsEcran[1]*0.009))
     boutonRetour = Bouton((dimensionsEcran[0]*0.74, dimensionsEcran[1]*0.02), "Retour", (dimensionsEcran[0]*0.09, dimensionsEcran[1]*0.052), COULEUR_BOUTONS, dimensionsEcran[1]/17, (dimensionsEcran[0]*0.008, dimensionsEcran[1]*0.009))
@@ -383,6 +390,9 @@ def afficherPivot(screen, dimensionsEcran:tuple, nbLignes:int, nbColonnes:int, c
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     boutonSolveur.appuye = True
+
+                elif images != [] and event.key == pygame.K_i:
+                    image = images[(images.index(image)+1)%len(images)]
             
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_r:
@@ -429,7 +439,7 @@ def afficherPivot(screen, dimensionsEcran:tuple, nbLignes:int, nbColonnes:int, c
             grille.deplacerPieces()
         
         screen.fill(COULEUR_FOND)
-        grille.dessiner(screen)
+        grille.dessiner(screen, image)
         for bouton in listeBoutons:
             bouton.afficher(screen)        
         pygame.display.update()

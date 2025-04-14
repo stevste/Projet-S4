@@ -2,22 +2,21 @@ from Enum import *
 
 import pygame
 
+IMAGE_CUBE = pygame.image.load("Images\PhotoCube.png")
+IMAGE_CUBE_2 = pygame.image.load("Images\PhotoCube2.png")
+IMAGE_CUBE_3 = pygame.image.load("Images\PhotoCube3.png")
+IMAGE_CUBE_4 = pygame.image.load("Images\PhotoCube4.png")
+IMAGE_CUBE_5 = pygame.image.load("Images\PhotoCube5.png")
+IMAGE_CUBE_6 = pygame.image.load("Images\PhotoCube6.png")
+IMAGE_CUBE_7 = pygame.image.load("Images\PhotoCube7.png")
 
-IMAGE_CUBE = pygame.image.load("PhotoCube.png")
-IMAGE_CUBE_2 = pygame.image.load("PhotoCube2.png")
-IMAGE_CUBE_3 = pygame.image.load("PhotoCube3.png")
-IMAGE_CUBE_4 = pygame.image.load("PhotoCube4.png")
-IMAGE_CUBE_5 = pygame.image.load("PhotoCube5.png")
-IMAGE_CUBE_6 = pygame.image.load("PhotoCube6.png")
-IMAGE_CUBE_7 = pygame.image.load("PhotoCube7.png")
+IMAGE_CARRE_3 = pygame.image.load("Images\PhotoCarre.png")
+IMAGE_CARRE_4 = pygame.image.load("Images\PhotoCarre4.png")
+IMAGE_CARRE_5 = pygame.image.load("Images\PhotoCarre5.png")
 
-IMAGE_CARRE_3 = pygame.image.load("PhotoCarre.png")
-IMAGE_CARRE_4 = pygame.image.load("PhotoCarre4.png")
-IMAGE_CARRE_5 = pygame.image.load("PhotoCarre5.png")
-
-IMAGE_PIVOT_2x3 = pygame.image.load("PhotoPivot.png")
-IMAGE_PIVOT_3x3 = pygame.image.load("PhotoPivot3x3.png")
-IMAGE_PIVOT_3x4 = pygame.image.load("PhotoPivot3x4.png")
+IMAGE_PIVOT_2x3 = pygame.image.load("Images\PhotoPivot.png")
+IMAGE_PIVOT_3x3 = pygame.image.load("Images\PhotoPivot3x3.png")
+IMAGE_PIVOT_3x4 = pygame.image.load("Images\PhotoPivot3x4.png")
 
 
 class Bouton:

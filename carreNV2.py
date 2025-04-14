@@ -3,12 +3,14 @@ from Enum import *
 
 
 dimensionsEcran = (1150, 650)
-VITESSE = 5
+
+VITESSE = 0.07
 COULEUR1 = (51, 91, 255)
 COULEUR2 = (94, 255, 51)
 COULEUR3 = (255, 51, 175)
 COULEUR4 = (25, 51, 175)
-COULEUR5 = (70, 205, 45)
+
+COULEUR5 = (50, 175, 25)
 LISTE_COULEURS = [COULEUR1, COULEUR2, COULEUR3, COULEUR4, COULEUR5]
 
 
@@ -25,7 +27,6 @@ class Piece:
         pygame.draw.rect(screen, self.couleur, pygame.Rect(self.position[0], self.position[1], self.taille[0], self.taille[1]), 0, 3)
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(self.position[0], self.position[1], self.taille[0], self.taille[1]), 2, 3)
 
-    
 class Bouton: # pour débuter solveur
     def __init__(self, position:tuple, texte:str, taille:tuple, couleur:tuple, taillePolice:int=35, positionTexte:str=(11.5, 3)):
         self.position = position # (x, y)
@@ -64,7 +65,7 @@ class Grille:
         self.origine = ((tailleFenetre[0] - coteCases*taille)/2, tailleFenetre[1]*0.1 + (tailleFenetre[1]*0.9 - coteCases*taille)/2)
         self.coteCases = coteCases
         self.taille = taille
-        
+
         self.pieces = []
         for ligne in range(taille):
             self.pieces.append([])
@@ -73,10 +74,11 @@ class Grille:
         
         self.pieceSelectionnee = None
         self.cases=[
-            Case((self.origine[0]+taille*self.coteCases, self.origine[1]), (self.coteCases, taille*self.coteCases)),
-            Case((self.origine[0]-self.coteCases, self.origine[1]), (self.coteCases, taille*self.coteCases)),
-            Case((self.origine[0], self.origine[1]-self.coteCases), (taille*self.coteCases, self.coteCases)),
-            Case((self.origine[0], self.origine[1]+taille*self.coteCases), (taille*self.coteCases, self.coteCases))]
+
+            Case((self.origine[0]+taille*self.coteCases+1, self.origine[1]), (self.coteCases, taille*self.coteCases)),
+            Case((self.origine[0]-self.coteCases, self.origine[1]), (self.coteCases-1, taille*self.coteCases)),
+            Case((self.origine[0], self.origine[1]-self.coteCases), (taille*self.coteCases, self.coteCases-1)),
+            Case((self.origine[0], self.origine[1]+taille*self.coteCases+1), (taille*self.coteCases, self.coteCases))]
     
     def __repr__(self) -> str:
         texte = ""
@@ -102,7 +104,8 @@ class Grille:
         return (int(px), int(py))
     
     def animerDeplacement(self, screen, piecesADeplacer:list, direction:int, axe:str, listeBoutons) -> None:
-        for i in range(int(self.coteCases // VITESSE)):
+
+        for i in range(int(1/VITESSE)):
             screen.fill((205, 214, 215))
             pygame.draw.rect(screen, (50, 50, 50), pygame.Rect(self.origine[0]-3, self.origine[1]-3, self.taille*self.coteCases +6, self.taille*self.coteCases +6), 0, 3) # fond grille
             for ligne in range(len(self.pieces)):
@@ -111,13 +114,13 @@ class Grille:
     
                     if piece in piecesADeplacer:
                         if axe == 'x':
-                            piece.position = (piece.position[0]+direction*VITESSE, piece.position[1])
+                            piece.position = (piece.position[0]+direction*VITESSE*self.coteCases, piece.position[1])
                             if piece.position[0] < self.origine[0]:
                                 cloneX = piece.position[0] + self.taille*self.coteCases # à droite
                             elif piece.position[0] >= self.origine[0] + (self.taille-1)*self.coteCases:
                                 cloneX = piece.position[0] - self.taille*self.coteCases # à gauche
                         else: # axe == 'y':
-                            piece.position = (piece.position[0], piece.position[1]+direction*VITESSE)
+                            piece.position = (piece.position[0], piece.position[1]+direction*VITESSE*self.coteCases)
                             if piece.position[1] < self.origine[1]:
                                 cloneY = piece.position[1] + self.taille*self.coteCases # en bas
                             elif piece.position[1] >= self.origine[1] + (self.taille-1)*self.coteCases:
@@ -191,8 +194,8 @@ class Aetoile:
             self.listePiece.append([])
             for colonne in range(len(self.config_actuelle[0])):
                 self.listePiece[ligne].append(LISTE_COULEURS.index(self.config_actuelle[ligne][colonne].couleur))
-        print(self.listePiece)
-        self.etat_initial = [self.listePiece, None, 1,0,0] # pieces, parent, g,h,f 
+
+        self.etat_initial = [self.listePiece, None, 0,0,0] # pieces, parent, g,h,f 
             
         self.open = []
         self.close = [] 
@@ -236,51 +239,87 @@ class Aetoile:
         return -1
 
    def but(self, liste:list) -> bool:
-        return liste == self.listeBut
-   
-   def heuristique1(self, liste, but):
+        if liste == self.listeBut:
+            return True
+
+   def heuristique(self, liste):
+       #h = self.heuristique2(liste)
+       h = self.heuristiqueLigneDispersee(liste)
+       h += self.heuristiqueColonneOrdonnee(liste)
+       return 0.7*h
+       
+   def heuristique1(self, liste):
        h = 0
        for i in range(self.taille):
            for j in range(self.taille):
-              if liste[i][j] != but[i][j]:
+              if liste[i][j] != self.but[i][j]:
                   h += 1
        return h
    
-   def heuristique2(self, liste, but):      
+   def heuristique2(self, liste):
         h = 0
         for ligne in range(self.taille):
             for colonne in range(self.taille):
                 h += abs(liste[ligne][colonne]-ligne) # écart entre la ligne sur laquelle la piece doit se trouver et celle sur laquelle elle est
         '''for i in range(self.taille):
             for j in range(self.taille):
-                if liste[i][j] != but[i][j]:
+                if liste[i][j] != self.but[i][j]:
                     for x in range(self.taille):
-                        if liste[i][j]==but[x][0]:  
+                        if liste[i][j]==self.but[x][0]:  
                             h += abs(i - x)'''
-        return h
+        return 0#h
     
-   def heuristiqueLigneComplete(self, liste) -> float:
+   def heuristiqueLigneDispersee(self, liste) -> int:
        h = 0
-       for ligne in range(self.taille):
-           nombreCasesBonneCouleur = 0
+       for couleur in range(self.taille):
+           nombreColonnesAyantCouleur = 0 # nombre de colonnes sur lesquelles la couleur est présente
            for colonne in range(self.taille):
-               if liste[ligne][colonne] == ligne:
-                   nombreCasesBonneCouleur += 1
-           h -= nombreCasesBonneCouleur/self.taille
-       return round(h, 1)
-    
-   def ajouter_etat(self, config: list, parent: list, g: int, h:int):
-       if not self.verif_close(config):
+               couleurPresente = 0
+               for ligne in range(self.taille):
+                   if liste[ligne][colonne] == couleur:
+                       couleurPresente = 1
+               nombreColonnesAyantCouleur += couleurPresente
+           h -= nombreColonnesAyantCouleur#/self.taille
+       return h#round(h, 1)
+   
+   def heuristiqueColonneOrdonnee(self, liste) -> int:
+       h = 0
+       for colonne in range(self.taille):
+           coefficientsOrdre = [None]*self.taille
+           for ligneDepart in range(self.taille):
+               coeffOrdre = 0
+               for variationLigne in range(self.taille):
+                   coeffOrdre += abs(liste[(ligneDepart+variationLigne)%self.taille][colonne] - ((liste[ligneDepart][colonne]+variationLigne)%self.taille))
+               coefficientsOrdre[ligneDepart] = coeffOrdre
+           miniPermutations = min(coefficientsOrdre)
+           ligneDepartMini = coefficientsOrdre.index(miniPermutations) # ligne à partir delaquelle les cases sont le plus dans l'ordre
+           h += miniPermutations + abs(liste[ligneDepartMini][colonne] - ligneDepartMini)
+       return h
+   
+   def symetrique(self, config:list) -> list:
+        symetrique = [[None] * self.taille for _ in range(self.taille)]
+        for ligne in range(self.taille):
+            for colonne in range(self.taille):
+                symetrique[ligne][colonne] = config[ligne][self.taille-colonne-1]
+        return symetrique
+   
+   def ajouter_etat(self, config:list, parent:list, g:int, h:int):
+       symetrique = self.symetrique(config)
+       if not self.verif_close(config) and not self.verif_close(symetrique):
            f = g + h
-           if not self.verif_open(config):
+           verifsDansOpen = (self.verif_open(config), self.verif_open(symetrique))
+           if verifsDansOpen == (False, False):
                self.open.append([config, parent, g, h, f])
-           else:
+           elif verifsDansOpen[0]: # la config existe déjà dans open
                index = self.determinerIndiceDansOpen(config)
                if index != -1 and g < self.open[index][2]:
                    self.open[index] = [config, parent, g, h, f]
-              
+           else: # le symétrique existe déjà dans open
+              index = self.determinerIndiceDansOpen(symetrique)
+              if index != -1 and g < self.open[index][2]:
+                  self.open[index] = [config, parent, g, h, f]
    
-   def ligneDeplacement(self,enCours:list,ligne:int,direction:int) -> list: # dans le aetoile
+   def ligneDeplacement(self, enCours:list,ligne:int,direction:int) -> list: # dans le aetoile
        config = [[None] * self.taille for _ in range(self.taille)]
        for l in range(len(enCours)):
             for j in range(len(enCours[0])):
@@ -308,23 +347,24 @@ class Aetoile:
            compteur += 1
            print("compteur", compteur)
            self.open.sort(key=lambda x: x[4])
-           self.enCours = self.open.pop(0)
-           self.close.append(self.enCours)
-           self.parent = self.enCours[0]
+           enCours = self.open.pop(0)
+           self.close.append(enCours)
+           parent = enCours[0]
            #print(self.enCours[0])
-           self.g = self.enCours[2] +1
-           #self.h = self.heuristique2(self.enCours[0], self.listeBut) #+ self.heuristique1(self.enCours[0], self.listeBut)
+           g = enCours[2] +1
+           #self.h = self.heuristique2(enCours[0], self.listeBut) #+ self.heuristique1(enCours[0], self.listeBut)
            #self.f = self.g + self.h
-           print("f, g, h :", self.enCours[4], self.enCours[2], self.enCours[3])
-           if self.but(self.parent):
-               return self.chemin(self.parent, self.enCours[1])
+           #print("f, g, h :", enCours[4], enCours[2], enCours[3])
+           if self.but(parent):
+               print("trouvé", compteur)
+               return self.chemin(parent, enCours[1])
 
            for i in range(self.taille):
                for direction in [-1, 1]:
-                   config = self.ligneDeplacement(self.parent, i, direction)
-                   self.ajouter_etat(config, self.parent, self.g, round(self.heuristique2(config, self.listeBut) + self.heuristiqueLigneComplete(config), 1))
-                   config = self.colonneDeplacement(self.parent, i, direction)
-                   self.ajouter_etat(config, self.parent, self.g, round(self.heuristique2(config, self.listeBut) + self.heuristiqueLigneComplete(config), 1))
+                   config = self.ligneDeplacement(parent, i, direction)
+                   self.ajouter_etat(config, parent, g, self.heuristique(config))
+                   config = self.colonneDeplacement(parent, i, direction)
+                   self.ajouter_etat(config, parent, g, self.heuristique(config))
                      
    def reconstituer_chemin(self, liste_mouvement:list, screen, listeBoutons:list)-> None:
         if liste_mouvement:
@@ -384,10 +424,50 @@ def afficherCarre(screen, dimensionsEcran, taille, fenetreActuelle):
             if event.type == pygame.QUIT:
                 fenetreSuivante = QUITTER
             
+            if event.type == pygame.KEYDOWN:
+                if event.key==pygame.K_KP7:
+                    grille.pieceSelectionnee = (0,0)
+                if event.key==pygame.K_KP8:
+                    grille.pieceSelectionnee = (1,0)
+                if event.key==pygame.K_KP9:
+                    grille.pieceSelectionnee = (2,0)
+                if event.key==pygame.K_KP4:
+                    grille.pieceSelectionnee = (0,1)
+                if event.key==pygame.K_KP5:
+                    grille.pieceSelectionnee = (1,1)
+                if event.key==pygame.K_KP6:
+                    grille.pieceSelectionnee = (2,1)
+                if event.key==pygame.K_KP1:
+                    grille.pieceSelectionnee = (0,2)
+                if event.key==pygame.K_KP2:
+                    grille.pieceSelectionnee = (1,2)
+                if event.key==pygame.K_KP3:
+                    grille.pieceSelectionnee = (2,2)
+                
+                
+                elif event.key == pygame.K_UP and grille.pieceSelectionnee is not None:
+                    grille.deplacerColonne(grille.pieceSelectionnee[0], -1, screen, listeBoutons)
+                    
+                elif event.key == pygame.K_DOWN and grille.pieceSelectionnee is not None:
+                    grille.deplacerColonne(grille.pieceSelectionnee[0], 1, screen, listeBoutons )
+               
+                elif event.key == pygame.K_RIGHT and grille.pieceSelectionnee is not None:
+                    grille.deplacerLigne(grille.pieceSelectionnee[1], 1, screen, listeBoutons )
+                    
+                elif event.key == pygame.K_LEFT and grille.pieceSelectionnee is not None:
+                    grille.deplacerLigne(grille.pieceSelectionnee[1], -1, screen, listeBoutons )
+            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if grille.boutonSolveur.zoneCollision.collidepoint(positionSouris):
+                    grille.boutonSolveur.appuye = True
+                    grille.affichergrille(screen)
+                    for bouton in listeBoutons:
+                        bouton.afficher(screen)
+                    pygame.display.update()
+                    
                     aetoile = Aetoile(grille, taille)
                     liste_mouvement = aetoile.mouvement()
+                    grille.boutonSolveur.appuye = False
                     aetoile.reconstituer_chemin(liste_mouvement, screen, listeBoutons)
                 else:   
                     positionSourisAncienne = pygame.mouse.get_pos() # renvoie tuple (x,y)

@@ -31,7 +31,7 @@ def dessinerCube(origine:tuple, baseLocale:tuple, couleur:tuple) -> None:
     dessinerCarre((origine[0], origine[1], origine[2]), (origine[0]+baseLocale[0][0], origine[1]+baseLocale[0][1], origine[2]+baseLocale[0][2]), (origine[0]+baseLocale[0][0]+baseLocale[2][0], origine[1]+baseLocale[0][1]+baseLocale[2][1], origine[2]+baseLocale[0][2]+baseLocale[2][2]), (origine[0]+baseLocale[2][0], origine[1]+baseLocale[2][1], origine[2]+baseLocale[2][2]), couleur) # Face inférieure
 
 
-def dessinerRubiksCube(rubiksCube) -> None:
+def dessinerRubiksCube(rubiksCube, afficherAxes:bool, baseCamera) -> None:
     glBegin(GL_QUADS)
     origine = (-(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2, -(rubiksCube.taille+2)/2)
     
@@ -86,6 +86,29 @@ def dessinerRubiksCube(rubiksCube) -> None:
                     couleur = Couleur.LIST.value[rubiksCube.configurationAnterieure[x][y][z-1].value]
                     dessinerCarre((origineCube[0]+0.05*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.05*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.05*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.05*uY[2]-0.001*uZ[2]), (origineCube[0]+0.95*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.95*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.95*uX[2]+0.95*uY[2]-0.001*uZ[2]), (origineCube[0]+0.05*uX[0]+0.95*uY[0]-0.001*uZ[0], origineCube[1]+0.05*uX[1]+0.95*uY[1]-0.001*uZ[1], origineCube[2]+0.05*uX[2]+0.95*uY[2]-0.001*uZ[2]), couleur)
     glEnd()
+    
+    if afficherAxes:
+        glBegin(GL_LINES)
+        glColor3f(1,0,0) # x monde
+        glVertex3fv((0,0,0))
+        glVertex3fv((3,0,0))
+        glColor3f(0,0.8,0) # y monde
+        glVertex3fv((0,0,0))
+        glVertex3fv((0,3,0))
+        glColor3f(0,0,1) # z monde
+        glVertex3fv((0,0,0))
+        glVertex3fv((0,0,3))
+        
+        glColor3f(1,0.5,0.5) # x caméra
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[0][0]*4, baseCamera[0][1]*4, baseCamera[0][2]*4))
+        glColor3f(0.5,1,0.5) # y caméra
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[1][0]*4, baseCamera[1][1]*4, baseCamera[1][2]*4))
+        glColor3f(0.6,0.6,1) # z caméra
+        glVertex3fv((0,0,0))
+        glVertex3fv((baseCamera[2][0]*4, baseCamera[2][1]*4, baseCamera[2][2]*4))
+        glEnd()
     
 
 def tournerCube(angle:float, baseCamera:list, axe=Axes.X) -> list:
@@ -315,6 +338,7 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
     positionClicSouris = None
     clicGaucheRotationCube = False
     mouvementEnCours = False
+    afficherAxes = False
     
     fenetreSuivante = fenetreActuelle
     while fenetreSuivante == fenetreActuelle:
@@ -340,6 +364,11 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
                     fenetreSuivante = MENU
                 elif event.key == pygame.K_c:
                     fenetreSuivante = CUBES
+                elif event.key == pygame.K_a:
+                    if not afficherAxes:
+                        afficherAxes = True
+                    else:
+                        afficherAxes = False
                     
         positionSouris = pygame.mouse.get_pos()
         keys = pygame.key.get_pressed()
@@ -430,7 +459,7 @@ def afficherRubiksCube(rubiksCube, screen, dimensionsEcran, fenetreActuelle):
         
         glClearColor(0.6, 0.8, 0.8, 0)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        dessinerRubiksCube(rubiksCube)
+        dessinerRubiksCube(rubiksCube, afficherAxes, baseCamera)
         
         pygame.display.flip()
         pygame.time.wait(40)

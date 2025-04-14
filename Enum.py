@@ -46,7 +46,6 @@ class Coins(Enum):
     DLF = 5
     DBL = 6
     DRB = 7
-
 class Aretes(IntEnum):
     UR = 0
     UF = 1
@@ -109,5 +108,6 @@ COULEUR_BOUTONS = (175, 215, 230)
 ROUGE = (200, 130, 130)
 VERT = (150, 215, 150)
 
-IMAGE_MULTICOLORE = pygame.image.load("imageMulticolore.jpg")
-IMAGE_COLOREE = pygame.image.load("imageColoree.jpg")
+IMAGE_MULTICOLORE = pygame.image.load("Images\imageMulticolore.jpg")
+IMAGE_COLOREE = pygame.image.load("Images\imageColoree.jpg")
+PHOTO_CUBES = pygame.image.load("Images\photoTousLesCubes.png")

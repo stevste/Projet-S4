@@ -111,6 +111,7 @@ class RubiksCube:
         
         for couronne in couronnesATourner:
             if nomFace == Faces.FRONT:
+
                 self.sensRotationEnCours = sens.value
                 self.pivoterPlan(Axes.Y, couronne, -sens.value)
             elif nomFace == Faces.BACK:
@@ -242,9 +243,3 @@ class RubiksCube:
 
 #cube = RubiksCube()
 #self.coinsEtAretes()
-'''print(cube)
-self.pivoterFace(Faces.DOWN, Sens.HORAIRE)
-print(cube)
-self.pivoterFace(Faces.RIGHT, Sens.HORAIRE)
-print(cube)
-'''
