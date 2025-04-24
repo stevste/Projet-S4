@@ -9,7 +9,7 @@ import pygame
 
 pygame.init()
 
-PLEIN_ECRAN = False
+PLEIN_ECRAN = True
 if PLEIN_ECRAN:
     dimensionsEcran = (pygame.display.Info().current_w, pygame.display.Info().current_h)
     #print(pygame.display.Info().current_w, pygame.display.Info().current_h)
